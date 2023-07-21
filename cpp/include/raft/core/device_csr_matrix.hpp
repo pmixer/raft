@@ -17,13 +17,36 @@
 
 #include <raft/core/csr_matrix.hpp>
 #include <raft/core/device_container_policy.hpp>
-#include <raft/core/device_resources.hpp>
 #include <raft/core/device_span.hpp>
 #include <raft/core/resource/cuda_stream.hpp>
+#include <raft/core/resources.hpp>
 #include <raft/core/sparse_types.hpp>
 #include <type_traits>
 
 namespace raft {
+
+/**
+ * Specialization for a sparsity-preserving compressed structure view which uses device memory
+ */
+template <typename IndptrType, typename IndicesType, typename NZType>
+using device_compressed_structure_view =
+  compressed_structure_view<IndptrType, IndicesType, NZType, true>;
+
+/**
+ * Specialization for a sparsity-owning compressed structure which uses device memory
+ */
+template <typename IndptrType,
+          typename IndicesType,
+          typename NZType,
+          template <typename T> typename ContainerPolicy = device_uvector_policy>
+using device_compressed_structure =
+  compressed_structure<IndptrType, IndicesType, NZType, true, ContainerPolicy>;
+
+/**
+ * Specialization for a csr matrix view which uses device memory
+ */
+template <typename ElementType, typename IndptrType, typename IndicesType, typename NZType>
+using device_csr_matrix_view = csr_matrix_view<ElementType, IndptrType, IndicesType, NZType, true>;
 
 template <typename ElementType,
           typename IndptrType,
@@ -44,6 +67,32 @@ template <typename ElementType,
           template <typename T> typename ContainerPolicy = device_uvector_policy>
 using device_sparsity_owning_csr_matrix =
   csr_matrix<ElementType, IndptrType, IndicesType, NZType, true, ContainerPolicy>;
+
+/**
+ * Specialization for a sparsity-preserving csr matrix which uses device memory
+ */
+template <typename ElementType,
+          typename IndptrType,
+          typename IndicesType,
+          typename NZType,
+          template <typename T> typename ContainerPolicy = device_uvector_policy>
+using device_sparsity_preserving_csr_matrix = csr_matrix<ElementType,
+                                                         IndptrType,
+                                                         IndicesType,
+                                                         NZType,
+                                                         true,
+                                                         ContainerPolicy,
+                                                         SparsityType::PRESERVING>;
+
+template <typename T>
+struct is_device_csr_matrix_view : std::false_type {};
+
+template <typename ElementType, typename IndptrType, typename IndicesType, typename NZType>
+struct is_device_csr_matrix_view<
+  device_csr_matrix_view<ElementType, IndptrType, IndicesType, NZType>> : std::true_type {};
+
+template <typename T>
+constexpr bool is_device_csr_matrix_view_v = is_device_csr_matrix_view<T>::value;
 
 template <typename T>
 struct is_device_csr_matrix : std::false_type {};
@@ -71,64 +120,19 @@ constexpr bool is_device_csr_sparsity_preserving_v =
   is_device_csr_matrix<T>::value and T::get_sparsity_type() == PRESERVING;
 
 /**
- * Specialization for a csr matrix view which uses device memory
- */
-template <typename ElementType, typename IndptrType, typename IndicesType, typename NZType>
-using device_csr_matrix_view = csr_matrix_view<ElementType, IndptrType, IndicesType, NZType, true>;
-
-/**
- * Specialization for a sparsity-preserving csr matrix which uses device memory
- */
-template <typename ElementType,
-          typename IndptrType,
-          typename IndicesType,
-          typename NZType,
-          template <typename T> typename ContainerPolicy = device_uvector_policy>
-using device_sparsity_preserving_csr_matrix = csr_matrix<ElementType,
-                                                         IndptrType,
-                                                         IndicesType,
-                                                         NZType,
-                                                         true,
-                                                         ContainerPolicy,
-                                                         SparsityType::PRESERVING>;
-
-/**
- * Specialization for a csr matrix view which uses device memory
- */
-template <typename ElementType, typename IndptrType, typename IndicesType, typename NZType>
-using device_csr_matrix_view = csr_matrix_view<ElementType, IndptrType, IndicesType, NZType, true>;
-
-/**
- * Specialization for a sparsity-owning compressed structure which uses device memory
- */
-template <typename IndptrType,
-          typename IndicesType,
-          typename NZType,
-          template <typename T> typename ContainerPolicy = device_uvector_policy>
-using device_compressed_structure =
-  compressed_structure<IndptrType, IndicesType, NZType, true, ContainerPolicy>;
-
-/**
- * Specialization for a sparsity-preserving compressed structure view which uses device memory
- */
-template <typename IndptrType, typename IndicesType, typename NZType>
-using device_compressed_structure_view =
-  compressed_structure_view<IndptrType, IndicesType, NZType, true>;
-
-/**
  * Create a sparsity-owning sparse matrix in the compressed-sparse row format. sparsity-owning
  * means that all of the underlying vectors (data, indptr, indices) are owned by the csr_matrix
  * instance. If not known up front, the sparsity can be ignored in this factory function and
  * `resize()` invoked on the instance once the sparsity is known.
  *
  * @code{.cpp}
- * #include <raft/core/device_resources.hpp>
+ * #include <raft/core/resources.hpp>
  * #include <raft/core/device_csr_matrix.hpp>
  *
  * int n_rows = 100000;
  * int n_cols = 10000;
  *
- * raft::device_resources handle;
+ * raft::resources handle;
  * csr_matrix = raft::make_device_csr_matrix(handle, n_rows, n_cols);
  * ...
  * // compute expected sparsity
@@ -151,7 +155,7 @@ template <typename ElementType,
           typename IndptrType,
           typename IndicesType,
           typename NZType = uint64_t>
-auto make_device_csr_matrix(raft::device_resources const& handle,
+auto make_device_csr_matrix(raft::resources const& handle,
                             IndptrType n_rows,
                             IndicesType n_cols,
                             NZType nnz = 0)
@@ -167,13 +171,13 @@ auto make_device_csr_matrix(raft::device_resources const& handle,
  * sparsity, the sparsity must be known up front, and cannot be resized later.
  *
  * @code{.cpp}
- * #include <raft/core/device_resources.hpp>
+ * #include <raft/core/resources.hpp>
  * #include <raft/core/device_csr_matrix.hpp>
  *
  * int n_rows = 100000;
  * int n_cols = 10000;
  *
- * raft::device_resources handle;
+ * raft::resources handle;
  * coo_structure = raft::make_device_compressed_structure(handle, n_rows, n_cols);
  * ...
  * // compute expected sparsity
@@ -195,7 +199,7 @@ template <typename ElementType,
           typename IndicesType,
           typename NZType = uint64_t>
 auto make_device_csr_matrix(
-  raft::device_resources const& handle,
+  raft::resources const& handle,
   device_compressed_structure_view<IndptrType, IndicesType, NZType> structure)
 {
   return device_sparsity_preserving_csr_matrix<ElementType, IndptrType, IndicesType, NZType>(
@@ -208,7 +212,7 @@ auto make_device_csr_matrix(
  * coo_matrix if sparsity needs to be mutable.
  *
  * @code{.cpp}
- * #include <raft/core/device_resources.hpp>
+ * #include <raft/core/resources.hpp>
  * #include <raft/core/device_csr_matrix.hpp>
  *
  * int n_rows = 100000;
@@ -218,7 +222,7 @@ auto make_device_csr_matrix(
  * // The following pointer is assumed to reference device memory for a size of nnz
  * float* d_elm_ptr = ...;
  *
- * raft::device_resources handle;
+ * raft::resources handle;
  * csr_structure = raft::make_device_compressed_structure(handle, n_rows, n_cols, nnz);
  * csr_matrix_view = raft::make_device_csr_matrix_view(handle, d_elm_ptr, csr_structure.view());
  * @endcode
@@ -248,7 +252,7 @@ auto make_device_csr_matrix_view(
  * sparsity-owning coo_matrix if sparsity needs to be mutable.
  *
  * @code{.cpp}
- * #include <raft/core/device_resources.hpp>
+ * #include <raft/core/resources.hpp>
  * #include <raft/core/device_span.hpp>
  * #include <raft/core/device_csr_matrix.hpp>
  *
@@ -259,7 +263,7 @@ auto make_device_csr_matrix_view(
  * // The following span is assumed to be of size nnz
  * raft::device_span<float> d_elm_ptr;
  *
- * raft::device_resources handle;
+ * raft::resources handle;
  * csr_structure = raft::make_device_compressed_structure(handle, n_rows, n_cols, nnz);
  * csr_matrix_view = raft::make_device_csr_matrix_view(handle, d_elm_ptr, csr_structure.view());
  * @endcode
@@ -291,14 +295,14 @@ auto make_device_csr_matrix_view(
  * the allocation of the underlying indices array is delayed until `resize(nnz)` is invoked.
  *
  * @code{.cpp}
- * #include <raft/core/device_resources.hpp>
+ * #include <raft/core/resources.hpp>
  * #include <raft/core/device_csr_matrix.hpp>
  *
  * int n_rows = 100000;
  * int n_cols = 10000;
  * int nnz = 5000;
  *
- * raft::device_resources handle;
+ * raft::resources handle;
  * csr_structure = raft::make_device_compressed_structure(handle, n_rows, n_cols, nnz);
  * ...
  * // compute expected sparsity
@@ -316,7 +320,7 @@ auto make_device_csr_matrix_view(
  * @return a sparsity-owning compressed structure instance
  */
 template <typename IndptrType, typename IndicesType, typename NZType = uint64_t>
-auto make_device_compressed_structure(raft::device_resources const& handle,
+auto make_device_compressed_structure(raft::resources const& handle,
                                       IndptrType n_rows,
                                       IndicesType n_cols,
                                       NZType nnz = 0)
@@ -330,7 +334,7 @@ auto make_device_compressed_structure(raft::device_resources const& handle,
  * sparsity is not known up front.
  *
  * @code{.cpp}
- * #include <raft/core/device_resources.hpp>
+ * #include <raft/core/resources.hpp>
  * #include <raft/core/device_csr_matrix.hpp>
  *
  * int n_rows = 100000;
@@ -343,7 +347,7 @@ auto make_device_compressed_structure(raft::device_resources const& handle,
  * // The following pointer is assumed to reference device memory of size nnz
  * int *indices = ...;
  *
- * raft::device_resources handle;
+ * raft::resources handle;
  * csr_structure = raft::make_device_compressed_structure_view(handle, indptr, indices, n_rows,
  * n_cols, nnz);
  * @endcode *
@@ -375,7 +379,7 @@ auto make_device_compressed_structure_view(
  * sparsity is not known up front.
  *
  * @code{.cpp}
- * #include <raft/core/device_resources.hpp>
+ * #include <raft/core/resources.hpp>
  * #include <raft/core/device_csr_matrix.hpp>
  *
  * int n_rows = 100000;
@@ -388,7 +392,7 @@ auto make_device_compressed_structure_view(
  * // The following device span is assumed to be of size nnz
  * raft::device_span<int> indices;
  *
- * raft::device_resources handle;
+ * raft::resources handle;
  * csr_structure = raft::make_device_compressed_structure_view(handle, indptr, indices, n_rows,
  * n_cols);
  * @endcode

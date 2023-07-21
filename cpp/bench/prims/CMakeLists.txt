@@ -116,8 +116,16 @@ if(BUILD_PRIMS_BENCH)
   )
 
   ConfigureBench(
-    NAME MATRIX_BENCH PATH bench/prims/matrix/argmin.cu bench/prims/matrix/gather.cu
-    bench/prims/matrix/select_k.cu bench/prims/main.cpp OPTIONAL LIB EXPLICIT_INSTANTIATE_ONLY
+    NAME
+    MATRIX_BENCH
+    PATH
+    bench/prims/matrix/argmin.cu
+    bench/prims/matrix/gather.cu
+    bench/prims/matrix/select_k.cu
+    bench/prims/matrix/main.cpp
+    OPTIONAL
+    LIB
+    EXPLICIT_INSTANTIATE_ONLY
   )
 
   ConfigureBench(
@@ -133,6 +141,7 @@ if(BUILD_PRIMS_BENCH)
     PATH
     bench/prims/neighbors/knn/brute_force_float_int64_t.cu
     bench/prims/neighbors/knn/brute_force_float_uint32_t.cu
+    bench/prims/neighbors/knn/cagra_float_uint32_t.cu
     bench/prims/neighbors/knn/ivf_flat_float_int64_t.cu
     bench/prims/neighbors/knn/ivf_flat_int8_t_int64_t.cu
     bench/prims/neighbors/knn/ivf_flat_uint8_t_int64_t.cu

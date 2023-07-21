@@ -15,6 +15,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <raft/core/resource/cuda_stream.hpp>
 
 #include <cusparse_v2.h>
 
@@ -60,12 +61,11 @@ class SparseDistanceTest
  public:
   SparseDistanceTest()
     : params(::testing::TestWithParam<SparseDistanceInputs<value_idx, value_t>>::GetParam()),
-      dist_config(handle),
-      indptr(0, handle.get_stream()),
-      indices(0, handle.get_stream()),
-      data(0, handle.get_stream()),
-      out_dists(0, handle.get_stream()),
-      out_dists_ref(0, handle.get_stream())
+      indptr(0, resource::get_cuda_stream(handle)),
+      indices(0, resource::get_cuda_stream(handle)),
+      data(0, resource::get_cuda_stream(handle)),
+      out_dists(0, resource::get_cuda_stream(handle)),
+      out_dists_ref(0, resource::get_cuda_stream(handle))
   {
   }
 
@@ -73,26 +73,27 @@ class SparseDistanceTest
   {
     make_data();
 
-    dist_config.b_nrows   = params.indptr_h.size() - 1;
-    dist_config.b_ncols   = params.n_cols;
-    dist_config.b_nnz     = params.indices_h.size();
-    dist_config.b_indptr  = indptr.data();
-    dist_config.b_indices = indices.data();
-    dist_config.b_data    = data.data();
-    dist_config.a_nrows   = params.indptr_h.size() - 1;
-    dist_config.a_ncols   = params.n_cols;
-    dist_config.a_nnz     = params.indices_h.size();
-    dist_config.a_indptr  = indptr.data();
-    dist_config.a_indices = indices.data();
-    dist_config.a_data    = data.data();
+    int out_size = static_cast<value_idx>(params.indptr_h.size() - 1) *
+                   static_cast<value_idx>(params.indptr_h.size() - 1);
 
-    int out_size = dist_config.a_nrows * dist_config.b_nrows;
+    out_dists.resize(out_size, resource::get_cuda_stream(handle));
 
-    out_dists.resize(out_size, handle.get_stream());
+    auto out = raft::make_device_matrix_view<value_t, value_idx>(
+      out_dists.data(),
+      static_cast<value_idx>(params.indptr_h.size() - 1),
+      static_cast<value_idx>(params.indptr_h.size() - 1));
 
-    pairwiseDistance(out_dists.data(), dist_config, params.metric, params.metric_arg);
+    auto x_structure = raft::make_device_compressed_structure_view<value_idx, value_idx, value_idx>(
+      indptr.data(),
+      indices.data(),
+      static_cast<value_idx>(params.indptr_h.size() - 1),
+      params.n_cols,
+      static_cast<value_idx>(params.indices_h.size()));
+    auto x = raft::make_device_csr_matrix_view<const value_t>(data.data(), x_structure);
 
-    RAFT_CUDA_TRY(cudaStreamSynchronize(handle.get_stream()));
+    pairwise_distance(handle, x, x, out, params.metric, params.metric_arg);
+
+    RAFT_CUDA_TRY(cudaStreamSynchronize(resource::get_cuda_stream(handle)));
   }
 
   void compare()
@@ -110,7 +111,7 @@ class SparseDistanceTest
     std::vector<value_idx> indices_h = params.indices_h;
     std::vector<value_t> data_h      = params.data_h;
 
-    auto stream = handle.get_stream();
+    auto stream = resource::get_cuda_stream(handle);
     indptr.resize(indptr_h.size(), stream);
     indices.resize(indices_h.size(), stream);
     data.resize(data_h.size(), stream);
@@ -126,10 +127,10 @@ class SparseDistanceTest
     update_device(out_dists_ref.data(),
                   out_dists_ref_h.data(),
                   out_dists_ref_h.size(),
-                  dist_config.handle.get_stream());
+                  resource::get_cuda_stream(handle));
   }
 
-  raft::device_resources handle;
+  raft::resources handle;
 
   // input data
   rmm::device_uvector<value_idx> indptr, indices;
@@ -139,7 +140,6 @@ class SparseDistanceTest
   rmm::device_uvector<value_t> out_dists, out_dists_ref;
 
   SparseDistanceInputs<value_idx, value_t> params;
-  raft::sparse::distance::distances_config_t<value_idx, value_t> dist_config;
 };
 
 const std::vector<SparseDistanceInputs<int, float>> inputs_i32_f = {

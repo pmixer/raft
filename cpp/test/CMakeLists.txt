@@ -215,6 +215,7 @@ if(BUILD_TESTS)
     test/linalg/norm.cu
     test/linalg/normalize.cu
     test/linalg/power.cu
+    test/linalg/randomized_svd.cu
     test/linalg/reduce.cu
     test/linalg/reduce_cols_by_key.cu
     test/linalg/reduce_rows_by_key.cu
@@ -237,6 +238,7 @@ if(BUILD_TESTS)
     test/matrix/columnSort.cu
     test/matrix/diagonal.cu
     test/matrix/gather.cu
+    test/matrix/eye.cu
     test/matrix/linewise_op.cu
     test/matrix/math.cu
     test/matrix/matrix.cu
@@ -314,6 +316,17 @@ if(BUILD_TESTS)
     NEIGHBORS_TEST
     PATH
     test/neighbors/ann_cagra/test_float_uint32_t.cu
+    test/neighbors/ann_cagra/test_int8_t_uint32_t.cu
+    test/neighbors/ann_cagra/test_uint8_t_uint32_t.cu
+    test/neighbors/ann_cagra/test_float_int64_t.cu
+    src/neighbors/detail/cagra/search_multi_cta_float_uint64_dim128_t8.cu
+    src/neighbors/detail/cagra/search_multi_cta_float_uint64_dim256_t16.cu
+    src/neighbors/detail/cagra/search_multi_cta_float_uint64_dim512_t32.cu
+    src/neighbors/detail/cagra/search_multi_cta_float_uint64_dim1024_t32.cu
+    src/neighbors/detail/cagra/search_single_cta_float_uint64_dim128_t8.cu
+    src/neighbors/detail/cagra/search_single_cta_float_uint64_dim256_t16.cu
+    src/neighbors/detail/cagra/search_single_cta_float_uint64_dim512_t32.cu
+    src/neighbors/detail/cagra/search_single_cta_float_uint64_dim1024_t32.cu
     test/neighbors/ann_ivf_flat/test_float_int64_t.cu
     test/neighbors/ann_ivf_flat/test_int8_t_int64_t.cu
     test/neighbors/ann_ivf_flat/test_uint8_t_int64_t.cu
@@ -370,7 +383,15 @@ if(BUILD_TESTS)
   )
 
   ConfigureTest(
-    NAME UTILS_TEST PATH test/core/seive.cu test/util/bitonic_sort.cu test/util/cudart_utils.cpp
-    test/util/device_atomics.cu test/util/integer_utils.cpp test/util/pow2_utils.cu
+    NAME
+    UTILS_TEST
+    PATH
+    test/core/seive.cu
+    test/util/bitonic_sort.cu
+    test/util/cudart_utils.cpp
+    test/util/device_atomics.cu
+    test/util/integer_utils.cpp
+    test/util/pow2_utils.cu
+    test/util/reduction.cu
   )
 endif()

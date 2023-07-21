@@ -17,7 +17,8 @@
 #pragma once
 
 #include <raft/core/device_csr_matrix.hpp>
-#include <raft/core/device_resources.hpp>
+#include <raft/core/resource/cuda_stream.hpp>
+#include <raft/core/resources.hpp>
 #include <raft/distance/distance.cuh>
 #include <raft/distance/distance_types.hpp>
 // #include <raft/sparse/detail/cusparse_wrappers.h>
@@ -71,7 +72,7 @@ class GramMatrixBase {
    * @param norm_x1 optional L2-norm of x1's rows for computation within RBF.
    * @param norm_x2 optional L2-norm of x2's rows for computation within RBF.
    */
-  void operator()(raft::device_resources const& handle,
+  void operator()(raft::resources const& handle,
                   dense_input_matrix_view_t<math_t> x1,
                   dense_input_matrix_view_t<math_t> x2,
                   dense_output_matrix_view_t<math_t> out,
@@ -91,7 +92,7 @@ class GramMatrixBase {
    * @param norm_x1 optional L2-norm of x1's rows for computation within RBF.
    * @param norm_x2 optional L2-norm of x2's rows for computation within RBF.
    */
-  void operator()(raft::device_resources const& handle,
+  void operator()(raft::resources const& handle,
                   csr_input_matrix_view_t<math_t> x1,
                   dense_input_matrix_view_t<math_t> x2,
                   dense_output_matrix_view_t<math_t> out,
@@ -111,7 +112,7 @@ class GramMatrixBase {
    * @param norm_x1 optional L2-norm of x1's rows for computation within RBF.
    * @param norm_x2 optional L2-norm of x2's rows for computation within RBF.
    */
-  void operator()(raft::device_resources const& handle,
+  void operator()(raft::resources const& handle,
                   csr_input_matrix_view_t<math_t> x1,
                   csr_input_matrix_view_t<math_t> x2,
                   dense_output_matrix_view_t<math_t> out,
@@ -132,7 +133,7 @@ class GramMatrixBase {
    * @param norm_x1 unused.
    * @param norm_x2 unused.
    */
-  virtual void evaluate(raft::device_resources const& handle,
+  virtual void evaluate(raft::resources const& handle,
                         dense_input_matrix_view_t<math_t> x1,
                         dense_input_matrix_view_t<math_t> x2,
                         dense_output_matrix_view_t<math_t> out,
@@ -150,7 +151,7 @@ class GramMatrixBase {
    * @param norm_x1 unused.
    * @param norm_x2 unused.
    */
-  virtual void evaluate(raft::device_resources const& handle,
+  virtual void evaluate(raft::resources const& handle,
                         csr_input_matrix_view_t<math_t> x1,
                         dense_input_matrix_view_t<math_t> x2,
                         dense_output_matrix_view_t<math_t> out,
@@ -168,7 +169,7 @@ class GramMatrixBase {
    * @param norm_x1 unused.
    * @param norm_x2 unused.
    */
-  virtual void evaluate(raft::device_resources const& handle,
+  virtual void evaluate(raft::resources const& handle,
                         csr_input_matrix_view_t<math_t> x1,
                         csr_input_matrix_view_t<math_t> x2,
                         dense_output_matrix_view_t<math_t> out,
@@ -345,7 +346,7 @@ class GramMatrixBase {
    * @param [in] x2 dense device matrix view, size [n2*n_cols]
    * @param [out] out dense device matrix view for the Gram matrix, size [n1*n2]
    */
-  void linear(raft::device_resources const& handle,
+  void linear(raft::resources const& handle,
               dense_input_matrix_view_t<math_t> x1,
               dense_input_matrix_view_t<math_t> x2,
               dense_output_matrix_view_t<math_t> out)
@@ -388,7 +389,7 @@ class GramMatrixBase {
                          &beta,
                          out.data_handle(),
                          ld_out,
-                         handle.get_stream());
+                         resource::get_cuda_stream(handle));
     } else {
       // #TODO: Use mdspan-based API when stride-capable
       // https://github.com/rapidsai/raft/issues/875
@@ -406,7 +407,7 @@ class GramMatrixBase {
                          &beta,
                          out.data_handle(),
                          ld_out,
-                         handle.get_stream());
+                         resource::get_cuda_stream(handle));
     }
   }
 
@@ -421,7 +422,7 @@ class GramMatrixBase {
    * @param [in] x2 dense device matrix view, size [n2*n_cols]
    * @param [out] out dense device matrix view for the Gram matrix, size [n1*n2]
    */
-  void linear(raft::device_resources const& handle,
+  void linear(raft::resources const& handle,
               csr_input_matrix_view_t<math_t> x1,
               dense_input_matrix_view_t<math_t> x2,
               dense_output_matrix_view_t<math_t> out)
@@ -458,52 +459,30 @@ class GramMatrixBase {
    * @param [in] x2 csr device matrix view, size [n2*n_cols]
    * @param [out] out dense device matrix view for the Gram matrix, size [n1*n2]
    */
-  void linear(raft::device_resources const& handle,
+  void linear(raft::resources const& handle,
               csr_input_matrix_view_t<math_t> x1,
               csr_input_matrix_view_t<math_t> x2,
               dense_output_matrix_view_t<math_t> out)
   {
-    // check is_row_major consistency
-    bool is_row_major = get_is_row_major(out);
-    int ld_out        = is_row_major ? out.stride(0) : out.stride(1);
-    int minor_out     = is_row_major ? out.extent(1) : out.extent(0);
-    ASSERT(ld_out == minor_out, "Sparse linear Kernel distance does not support ld_out parameter");
+    // check layout consistency (w.r.t. strides a matrix might be both row & col major)
+    bool is_row_major_nopad = get_is_row_major(out) && out.stride(0) == out.extent(1);
+    bool is_col_major_nopad = get_is_col_major(out) && out.stride(1) == out.extent(0);
 
-    auto x1_structure = x1.structure_view();
-    auto x2_structure = x2.structure_view();
-    raft::sparse::distance::distances_config_t<int, math_t> dist_config(handle);
+    ASSERT(is_row_major_nopad || is_col_major_nopad,
+           "Sparse linear Kernel distance does not support ld_out parameter");
 
     // switch a,b based on is_row_major
-    if (!is_row_major) {
-      dist_config.a_nrows   = x2_structure.get_n_rows();
-      dist_config.a_ncols   = x2_structure.get_n_cols();
-      dist_config.a_nnz     = x2_structure.get_nnz();
-      dist_config.a_indptr  = const_cast<int*>(x2_structure.get_indptr().data());
-      dist_config.a_indices = const_cast<int*>(x2_structure.get_indices().data());
-      dist_config.a_data    = const_cast<math_t*>(x2.get_elements().data());
-      dist_config.b_nrows   = x1_structure.get_n_rows();
-      dist_config.b_ncols   = x1_structure.get_n_cols();
-      dist_config.b_nnz     = x1_structure.get_nnz();
-      dist_config.b_indptr  = const_cast<int*>(x1_structure.get_indptr().data());
-      dist_config.b_indices = const_cast<int*>(x1_structure.get_indices().data());
-      dist_config.b_data    = const_cast<math_t*>(x1.get_elements().data());
+    if (is_col_major_nopad) {
+      auto out_row_major = raft::make_device_matrix_view<math_t, int, raft::row_major>(
+        out.data_handle(), out.extent(1), out.extent(0));
+      raft::sparse::distance::pairwise_distance(
+        handle, x2, x1, out_row_major, raft::distance::DistanceType::InnerProduct, 0.0);
     } else {
-      dist_config.a_nrows   = x1_structure.get_n_rows();
-      dist_config.a_ncols   = x1_structure.get_n_cols();
-      dist_config.a_nnz     = x1_structure.get_nnz();
-      dist_config.a_indptr  = const_cast<int*>(x1_structure.get_indptr().data());
-      dist_config.a_indices = const_cast<int*>(x1_structure.get_indices().data());
-      dist_config.a_data    = const_cast<math_t*>(x1.get_elements().data());
-      dist_config.b_nrows   = x2_structure.get_n_rows();
-      dist_config.b_ncols   = x2_structure.get_n_cols();
-      dist_config.b_nnz     = x2_structure.get_nnz();
-      dist_config.b_indptr  = const_cast<int*>(x2_structure.get_indptr().data());
-      dist_config.b_indices = const_cast<int*>(x2_structure.get_indices().data());
-      dist_config.b_data    = const_cast<math_t*>(x2.get_elements().data());
+      auto out_row_major = raft::make_device_matrix_view<math_t, int, raft::row_major>(
+        out.data_handle(), out.extent(0), out.extent(1));
+      raft::sparse::distance::pairwise_distance(
+        handle, x1, x2, out_row_major, raft::distance::DistanceType::InnerProduct, 0.0);
     }
-
-    raft::sparse::distance::pairwiseDistance(
-      out.data_handle(), dist_config, raft::distance::DistanceType::InnerProduct, 0.0);
   }
 };
 
