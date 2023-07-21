@@ -17,6 +17,9 @@
  */
 
 #pragma once
+
+#include "util.h"
+
 #include <string>
 #include <vector>
 
@@ -27,12 +30,6 @@ namespace raft::bench::ann {
 enum class Metric {
   kInnerProduct,
   kEuclidean,
-};
-
-enum class MemoryType {
-  Host,
-  HostMmap,
-  Device,
 };
 
 struct AlgoProperty {

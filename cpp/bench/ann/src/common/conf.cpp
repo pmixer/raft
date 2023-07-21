@@ -62,6 +62,9 @@ void Configuration::parse_dataset_(const nlohmann::json& conf)
   dataset_conf_.query_file = conf.at("query_file");
   dataset_conf_.distance   = conf.at("distance");
 
+  if (conf.contains("groundtruth_neighbors_file")) {
+    dataset_conf_.groundtruth_neighbors_file = conf.at("groundtruth_neighbors_file");
+  }
   if (conf.contains("subset_first_row")) {
     dataset_conf_.subset_first_row = conf.at("subset_first_row");
   }

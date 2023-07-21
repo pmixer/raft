@@ -15,7 +15,7 @@
  */
 #pragma once
 
-#include <cstdint>
+#include "util.h"
 
 #ifndef CPU_ONLY
 #include <cuda_fp16.h>
@@ -29,7 +29,9 @@ typedef uint16_t half;
 #include <sys/stat.h>
 
 #include <cassert>
+#include <cstdint>
 #include <cstdio>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -254,6 +256,7 @@ class Dataset {
   std::string name() const { return name_; }
   std::string distance() const { return distance_; }
   virtual int dim() const               = 0;
+  virtual uint32_t max_k() const        = 0;
   virtual size_t base_set_size() const  = 0;
   virtual size_t query_set_size() const = 0;
 
@@ -271,12 +274,37 @@ class Dataset {
     return query_set_;
   }
 
+  const int32_t* gt_set() const
+  {
+    if (!gt_set_) { load_gt_set_(); }
+    return gt_set_;
+  }
+
   const T* base_set_on_gpu() const;
   const T* query_set_on_gpu() const;
   const T* mapped_base_set() const;
 
+  auto query_set(MemoryType memory_type) const -> const T*
+  {
+    switch (memory_type) {
+      case MemoryType::Device: return query_set_on_gpu();
+      default: return query_set();
+    }
+  }
+
+  auto base_set(MemoryType memory_type) const -> const T*
+  {
+    switch (memory_type) {
+      case MemoryType::Device: return base_set_on_gpu();
+      case MemoryType::Host: return base_set();
+      case MemoryType::HostMmap: return mapped_base_set();
+      default: return nullptr;
+    }
+  }
+
  protected:
   virtual void load_base_set_() const  = 0;
+  virtual void load_gt_set_() const    = 0;
   virtual void load_query_set_() const = 0;
   virtual void map_base_set_() const   = 0;
 
@@ -288,6 +316,7 @@ class Dataset {
   mutable T* d_base_set_      = nullptr;
   mutable T* d_query_set_     = nullptr;
   mutable T* mapped_base_set_ = nullptr;
+  mutable int32_t* gt_set_    = nullptr;
 };
 
 template <typename T>
@@ -295,6 +324,7 @@ Dataset<T>::~Dataset()
 {
   delete[] base_set_;
   delete[] query_set_;
+  delete[] gt_set_;
 #ifndef CPU_ONLY
   if (d_base_set_) { cudaFree(d_base_set_); }
   if (d_query_set_) { cudaFree(d_query_set_); }
@@ -344,27 +374,32 @@ class BinDataset : public Dataset<T> {
              size_t subset_first_row,
              size_t subset_size,
              const std::string& query_file,
-             const std::string& distance);
+             const std::string& distance,
+             const std::optional<std::string>& groundtruth_neighbors_file);
   ~BinDataset()
   {
     if (this->mapped_base_set_) { base_file_.unmap(); }
   }
 
   int dim() const override;
+  uint32_t max_k() const override;
   size_t base_set_size() const override;
   size_t query_set_size() const override;
 
  private:
   void load_base_set_() const override;
   void load_query_set_() const override;
+  void load_gt_set_() const override;
   void map_base_set_() const override;
 
   mutable int dim_               = 0;
+  mutable uint32_t max_k_        = 0;
   mutable size_t base_set_size_  = 0;
   mutable size_t query_set_size_ = 0;
 
   BinFile<T> base_file_;
   BinFile<T> query_file_;
+  std::optional<BinFile<std::int32_t>> gt_file_{std::nullopt};
 };
 
 template <typename T>
@@ -373,11 +408,15 @@ BinDataset<T>::BinDataset(const std::string& name,
                           size_t subset_first_row,
                           size_t subset_size,
                           const std::string& query_file,
-                          const std::string& distance)
+                          const std::string& distance,
+                          const std::optional<std::string>& groundtruth_neighbors_file)
   : Dataset<T>(name, distance),
     base_file_(base_file, "r", subset_first_row, subset_size),
     query_file_(query_file, "r")
 {
+  if (groundtruth_neighbors_file.has_value()) {
+    gt_file_.emplace(groundtruth_neighbors_file.value(), "r");
+  }
 }
 
 template <typename T>
@@ -387,6 +426,13 @@ int BinDataset<T>::dim() const
   if (base_set_size() > 0) { return dim_; }
   if (query_set_size() > 0) { return dim_; }
   return dim_;
+}
+
+template <typename T>
+uint32_t BinDataset<T>::max_k() const
+{
+  if (!this->gt_set_) { load_gt_set_(); }
+  return max_k_;
 }
 
 template <typename T>
@@ -435,6 +481,19 @@ void BinDataset<T>::load_query_set_() const
 {
   this->query_set_ = new T[query_set_size() * dim()];
   query_file_.read(this->query_set_);
+}
+
+template <typename T>
+void BinDataset<T>::load_gt_set_() const
+{
+  if (gt_file_.has_value()) {
+    size_t queries;
+    int k;
+    gt_file_->get_shape(&queries, &k);
+    this->gt_set_ = new std::int32_t[queries * k];
+    gt_file_->read(this->gt_set_);
+    max_k_ = k;
+  }
 }
 
 template <typename T>

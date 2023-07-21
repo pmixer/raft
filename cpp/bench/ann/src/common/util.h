@@ -15,8 +15,11 @@
  */
 #pragma once
 
+#include <cuda_runtime_api.h>
+
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <ctime>
 #include <iostream>
 #include <string>
@@ -24,20 +27,113 @@
 
 namespace raft::bench::ann {
 
-class Timer {
- public:
-  Timer() { reset(); }
-  void reset() { start_time_ = std::chrono::steady_clock::now(); }
-  float elapsed_ms()
+enum class MemoryType {
+  Host,
+  HostMmap,
+  Device,
+};
+
+template <typename T>
+struct buf {
+  MemoryType memory_type;
+  std::size_t size;
+  T* data;
+  buf(MemoryType memory_type, std::size_t size)
+    : memory_type(memory_type), size(size), data(nullptr)
   {
-    auto end_time = std::chrono::steady_clock::now();
-    auto dur =
-      std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(end_time - start_time_);
-    return dur.count();
+    switch (memory_type) {
+      case MemoryType::Device: {
+        cudaMalloc(reinterpret_cast<void**>(&data), size * sizeof(T));
+        cudaMemset(data, 0, size * sizeof(T));
+      } break;
+      default: {
+        data = reinterpret_cast<T*>(malloc(size * sizeof(T)));
+        std::memset(data, 0, size * sizeof(T));
+      }
+    }
+  }
+  ~buf() noexcept
+  {
+    if (data == nullptr) { return; }
+    switch (memory_type) {
+      case MemoryType::Device: {
+        cudaFree(data);
+      } break;
+      default: {
+        free(data);
+      }
+    }
   }
 
+  [[nodiscard]] auto move(MemoryType target_memory_type) -> buf<T>
+  {
+    buf<T> r{target_memory_type, size};
+    if ((memory_type == MemoryType::Device && target_memory_type != MemoryType::Device) ||
+        (memory_type != MemoryType::Device && target_memory_type == MemoryType::Device)) {
+      cudaMemcpy(r.data, data, size * sizeof(T), cudaMemcpyDefault);
+    } else {
+      std::swap(data, r.data);
+    }
+    return r;
+  }
+};
+
+struct cuda_timer {
  private:
-  std::chrono::steady_clock::time_point start_time_;
+  cudaStream_t stream_;
+  cudaEvent_t start_;
+  cudaEvent_t stop_;
+  double total_time_{0};
+
+ public:
+  struct cuda_lap {
+   private:
+    cudaStream_t stream_;
+    cudaEvent_t start_;
+    cudaEvent_t stop_;
+    double& total_time_;
+
+   public:
+    cuda_lap(cudaStream_t stream, cudaEvent_t start, cudaEvent_t stop, double& total_time)
+      : start_(start), stop_(stop), stream_(stream), total_time_(total_time)
+    {
+      cudaStreamSynchronize(stream_);
+      cudaEventRecord(start_, stream_);
+    }
+    cuda_lap() = delete;
+
+    ~cuda_lap() noexcept
+    {
+      cudaEventRecord(stop_, stream_);
+      cudaEventSynchronize(stop_);
+      float milliseconds = 0.0f;
+      cudaEventElapsedTime(&milliseconds, start_, stop_);
+      total_time_ += milliseconds / 1000.0;
+    }
+  };
+
+  cuda_timer()
+  {
+    cudaStreamCreateWithFlags(&stream_, cudaStreamNonBlocking);
+    cudaEventCreate(&stop_);
+    cudaEventCreate(&start_);
+  }
+
+  ~cuda_timer() noexcept
+  {
+    cudaEventDestroy(start_);
+    cudaEventDestroy(stop_);
+    cudaStreamDestroy(stream_);
+  }
+
+  [[nodiscard]] auto stream() const -> cudaStream_t { return stream_; }
+
+  [[nodiscard]] auto total_time() const -> double { return total_time_; }
+
+  [[nodiscard]] auto lap() -> cuda_timer::cuda_lap
+  {
+    return cuda_lap{stream_, start_, stop_, total_time_};
+  }
 };
 
 std::vector<std::string> split(const std::string& s, char delimiter);
@@ -45,6 +141,15 @@ std::vector<std::string> split(const std::string& s, char delimiter);
 bool file_exists(const std::string& filename);
 bool dir_exists(const std::string& dir);
 bool create_dir(const std::string& dir);
+
+inline void make_sure_parent_dir_exists(const std::string& file_path)
+{
+  const auto pos = file_path.rfind('/');
+  if (pos != std::string::npos) {
+    auto dir = file_path.substr(0, pos);
+    if (!dir_exists(dir)) { create_dir(dir); }
+  }
+}
 
 template <typename... Ts>
 void log_(const char* level, Ts... vs)

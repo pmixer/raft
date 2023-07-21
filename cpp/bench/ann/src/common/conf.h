@@ -15,6 +15,7 @@
  */
 #pragma once
 #include <iostream>
+#include <optional>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -52,6 +53,7 @@ class Configuration {
     size_t subset_size{0};
     std::string query_file;
     std::string distance;
+    std::optional<std::string> groundtruth_neighbors_file{std::nullopt};
 
     // data type of input dataset, possible values ["float", "int8", "uint8"]
     std::string dtype;

@@ -88,6 +88,7 @@ function(ConfigureAnnBench)
             $<$<BOOL:${RAFT_ANN_BENCH_USE_MULTIGPU}>:NCCL::NCCL>
             ${ConfigureAnnBench_LINKS}
             Threads::Threads
+            benchmark::benchmark
             ${RAFT_CTK_MATH_DEPENDENCIES}
             $<TARGET_NAME_IF_EXISTS:OpenMP::OpenMP_CXX>
             $<TARGET_NAME_IF_EXISTS:conda_env>
