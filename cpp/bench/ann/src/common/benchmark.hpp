@@ -13,23 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifdef NVTX
-#include <nvtx3/nvToolsExt.h>
-#endif
-#include <unistd.h>
-
-#include <algorithm>
-#include <cmath>
-#include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <limits>
-#include <memory>
-#include <numeric>
-#include <string>
-#include <unordered_set>
-#include <vector>
-
 #include <raft/util/integer_utils.hpp>
 
 #include "benchmark_util.hpp"
@@ -38,6 +21,17 @@
 #include "util.h"
 
 #include <benchmark/benchmark.h>
+
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <limits>
+#include <memory>
+#include <numeric>
+#include <string>
+#include <unistd.h>
+#include <unordered_set>
+#include <vector>
 
 namespace raft::bench::ann {
 
@@ -78,12 +72,12 @@ void bench_build(::benchmark::State& state,
     }
   }
 
-  const auto algo = create_algo<T>(index.algo,
-                                   dataset->distance(),
-                                   dataset->dim(),
-                                   index.refine_ratio,
-                                   index.build_param,
-                                   index.dev_list);
+  const auto algo = ann::create_algo<T>(index.algo,
+                                        dataset->distance(),
+                                        dataset->dim(),
+                                        index.refine_ratio,
+                                        index.build_param,
+                                        index.dev_list);
 
   const auto algo_property = algo->get_property();
 
@@ -103,6 +97,7 @@ void bench_build(::benchmark::State& state,
     {{"GPU Time", gpu_timer.total_time() / state.iterations()}, {"index_size", index_size}});
   dump_parameters(state, index.build_param);
 
+  if (state.skipped()) { return; }
   make_sure_parent_dir_exists(index.file);
   algo->save(index.file);
 }
@@ -131,17 +126,19 @@ void bench_search(::benchmark::State& state,
   // Round down the query data to a multiple of the batch size to loop over full batches of data
   const std::size_t query_set_size = (dataset->query_set_size() / batch_size) * batch_size;
 
-  const auto algo    = create_algo<T>(index.algo,
-                                   dataset->distance(),
-                                   dataset->dim(),
-                                   index.refine_ratio,
-                                   index.build_param,
-                                   index.dev_list);
-  const auto p_param = create_search_param<T>(index.algo, index.search_params[search_param_ix]);
+  const auto algo = ann::create_algo<T>(index.algo,
+                                        dataset->distance(),
+                                        dataset->dim(),
+                                        index.refine_ratio,
+                                        index.build_param,
+                                        index.dev_list);
+  const auto p_param =
+    ann::create_search_param<T>(index.algo, index.search_params[search_param_ix]);
   algo->set_search_param(*p_param);
 
   if (!file_exists(index.file)) {
     state.SkipWithError("Index file is missing. Run the benchmark in the build mode first.");
+    return;
   }
   algo->load(index.file);
 
@@ -151,8 +148,14 @@ void bench_search(::benchmark::State& state,
   buf<std::size_t> neighbors{algo_property.query_memory_type, k * query_set_size};
 
   if (algo_property.need_dataset_when_search) {
-    algo->set_search_dataset(dataset->base_set(algo_property.dataset_memory_type),
-                             dataset->base_set_size());
+    try {
+      algo->set_search_dataset(dataset->base_set(algo_property.dataset_memory_type),
+                               dataset->base_set_size());
+    } catch (const std::exception&) {
+      state.SkipWithError("The algorithm '" + index.name +
+                          "' requires the base set, but it's not available.");
+      return;
+    }
   }
 
   std::ptrdiff_t batch_offset   = 0;
@@ -182,6 +185,7 @@ void bench_search(::benchmark::State& state,
                          {"k", k},
                          {"n_queries", batch_size}});
   dump_parameters(state, index.search_params[search_param_ix]);
+  if (state.skipped()) { return; }
 
   // evaluate recall
   if (dataset->max_k() >= k) {
@@ -228,39 +232,73 @@ inline void printf_usage()
   fprintf(stdout,
           "          [--build|--search] \n"
           "          [--overwrite]\n"
-          "          conf.json\n"
+          "          [--data_prefix=<prefix>]\n"
+          "          <conf>.json\n"
           "\n"
           "Note the non-standard benchmark parameters:\n"
           "  --build: build mode, will build index\n"
           "  --search: search mode, will search using the built index\n"
           "            one and only one of --build and --search should be specified\n"
-          "  --overwrite: force overwriting existing index files\n");
+          "  --overwrite: force overwriting existing index files\n"
+          "  --data_prefix=<prefix>:"
+          " prepend <prefix> to dataset file paths specified in the <conf>.json.\n");
 }
 
 template <typename T>
 void dispatch_benchmark(const Configuration& conf,
                         bool force_overwrite,
                         bool build_mode,
-                        bool search_mode)
+                        bool search_mode,
+                        std::string prefix)
 {
   const auto dataset_conf = conf.get_dataset_conf();
-  auto dataset            = std::make_shared<BinDataset<T>>(dataset_conf.name,
-                                                 dataset_conf.base_file,
+  auto base_file          = combine_path(prefix, dataset_conf.base_file);
+  auto query_file         = combine_path(prefix, dataset_conf.query_file);
+  auto gt_file            = dataset_conf.groundtruth_neighbors_file;
+  if (gt_file.has_value()) { gt_file.emplace(combine_path(prefix, gt_file.value())); }
+  auto dataset = std::make_shared<BinDataset<T>>(dataset_conf.name,
+                                                 base_file,
                                                  dataset_conf.subset_first_row,
                                                  dataset_conf.subset_size,
-                                                 dataset_conf.query_file,
+                                                 query_file,
                                                  dataset_conf.distance,
-                                                 dataset_conf.groundtruth_neighbors_file);
+                                                 gt_file);
   ::benchmark::AddCustomContext("dataset", dataset_conf.name);
   ::benchmark::AddCustomContext("distance", dataset_conf.distance);
   std::vector<Configuration::Index> indices = conf.get_indices("*");
   if (build_mode) {
-    ::benchmark::AddCustomContext("n_records", std::to_string(dataset->base_set_size()));
-    ::benchmark::AddCustomContext("dim", std::to_string(dataset->dim()));
+    if (file_exists(base_file)) {
+      log_info("Using the dataset file '%s'", base_file.c_str());
+      ::benchmark::AddCustomContext("n_records", std::to_string(dataset->base_set_size()));
+      ::benchmark::AddCustomContext("dim", std::to_string(dataset->dim()));
+    } else {
+      log_warn("Dataset file '%s' does not exist; benchmarking index building is impossible.",
+               base_file.c_str());
+    }
     register_build<T>(dataset, indices, force_overwrite);
   } else if (search_mode) {
-    (void)(dataset->query_set_size());  // touch queries to populate dim as well
-    ::benchmark::AddCustomContext("dim", std::to_string(dataset->dim()));
+    if (file_exists(query_file)) {
+      log_info("Using the query file '%s'", query_file.c_str());
+      ::benchmark::AddCustomContext("max_n_queries", std::to_string(dataset->query_set_size()));
+      ::benchmark::AddCustomContext("dim", std::to_string(dataset->dim()));
+      if (gt_file.has_value()) {
+        if (file_exists(*gt_file)) {
+          log_info("Using the ground truth file '%s'", gt_file->c_str());
+          ::benchmark::AddCustomContext("max_k", std::to_string(dataset->max_k()));
+        } else {
+          log_warn("Ground truth file '%s' does not exist; the recall won't be reported.",
+                   gt_file->c_str());
+        }
+      } else {
+        log_warn(
+          "Ground truth file is not provided; the recall won't be reported. NB: use "
+          "the 'groundtruth_neighbors_file' alongside the 'query_file' key to specify the path to "
+          "the ground truth in your conf.json.");
+      }
+    } else {
+      log_warn("Query file '%s' does not exist; benchmarking search is impossible.",
+               query_file.c_str());
+    }
     register_search<T>(dataset, indices);
   }
 }
@@ -274,11 +312,22 @@ inline auto parse_bool_flag(const char* arg, const char* pat, bool& result) -> b
   return false;
 }
 
+inline auto parse_string_flag(const char* arg, const char* pat, std::string& result) -> bool
+{
+  auto n = strlen(pat);
+  if (strncmp(pat, arg, strlen(pat)) == 0) {
+    result = arg + n + 1;
+    return true;
+  }
+  return false;
+}
+
 inline auto run_main(int argc, char** argv) -> int
 {
   bool force_overwrite = false;
   bool build_mode      = false;
   bool search_mode     = false;
+  std::string prefix   = "data";
 
   char arg0_default[] = "benchmark";  // NOLINT
   char* args_default  = arg0_default;
@@ -297,7 +346,8 @@ inline auto run_main(int argc, char** argv) -> int
   for (int i = 1; i < argc; i++) {
     if (parse_bool_flag(argv[i], "--overwrite", force_overwrite) ||
         parse_bool_flag(argv[i], "--build", build_mode) ||
-        parse_bool_flag(argv[i], "--search", search_mode)) {
+        parse_bool_flag(argv[i], "--search", search_mode) ||
+        parse_string_flag(argv[i], "--data_prefix", prefix)) {
       for (int j = i; j < argc - 1; j++) {
         argv[j] = argv[j + 1];
       }
@@ -307,14 +357,13 @@ inline auto run_main(int argc, char** argv) -> int
   }
 
   if (build_mode == search_mode) {
-    std::cerr << "one and only one of --build and --search should be specified" << std::endl
-              << std::endl;
+    log_error("One and only one of --build and --search should be specified");
     printf_usage();
     return -1;
   }
 
   if (!conf_stream) {
-    std::cerr << "can't open configuration file: " << conf_path << std::endl;
+    log_error("Can't open configuration file: %s", conf_path);
     return -1;
   }
 
@@ -322,13 +371,13 @@ inline auto run_main(int argc, char** argv) -> int
   std::string dtype = conf.get_dataset_conf().dtype;
 
   if (dtype == "float") {
-    dispatch_benchmark<float>(conf, force_overwrite, build_mode, search_mode);
+    dispatch_benchmark<float>(conf, force_overwrite, build_mode, search_mode, prefix);
   } else if (dtype == "uint8") {
-    dispatch_benchmark<std::uint8_t>(conf, force_overwrite, build_mode, search_mode);
+    dispatch_benchmark<std::uint8_t>(conf, force_overwrite, build_mode, search_mode, prefix);
   } else if (dtype == "int8") {
-    dispatch_benchmark<std::int8_t>(conf, force_overwrite, build_mode, search_mode);
+    dispatch_benchmark<std::int8_t>(conf, force_overwrite, build_mode, search_mode, prefix);
   } else {
-    std::cerr << "datatype " << dtype << " is not supported" << std::endl;
+    log_error("datatype '%s' is not supported", dtype.c_str());
     return -1;
   }
 

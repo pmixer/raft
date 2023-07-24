@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include <filesystem>
+
 namespace raft::bench::ann {
 
 enum class MemoryType {
@@ -151,34 +153,45 @@ inline void make_sure_parent_dir_exists(const std::string& file_path)
   }
 }
 
+inline auto combine_path(const std::string& dir, const std::string& path)
+{
+  std::filesystem::path p_dir(dir);
+  std::filesystem::path p_suf(path);
+  return (p_dir / p_suf).string();
+}
+
 template <typename... Ts>
-void log_(const char* level, Ts... vs)
+void log_(const char* level, const Ts&... vs)
 {
   char buf[20];
   std::time_t now = std::time(nullptr);
   std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
   printf("%s [%s] ", buf, level);
-  printf(vs...);
+  if constexpr (sizeof...(Ts) == 1) {
+    printf("%s", vs...);
+  } else {
+    printf(vs...);
+  }
   printf("\n");
   fflush(stdout);
 }
 
 template <typename... Ts>
-void log_info(Ts... vs)
+void log_info(Ts&&... vs)
 {
-  log_("info", vs...);
+  log_("info", std::forward<Ts>(vs)...);
 }
 
 template <typename... Ts>
-void log_warn(Ts... vs)
+void log_warn(Ts&&... vs)
 {
-  log_("warn", vs...);
+  log_("warn", std::forward<Ts>(vs)...);
 }
 
 template <typename... Ts>
-void log_error(Ts... vs)
+void log_error(Ts&&... vs)
 {
-  log_("error", vs...);
+  log_("error", std::forward<Ts>(vs)...);
 }
 
 }  // namespace raft::bench::ann

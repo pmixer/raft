@@ -38,7 +38,6 @@ class Configuration {
     int k;
     int run_count;
     std::vector<nlohmann::json> search_params;
-    std::string search_result_file;
     float refine_ratio{0.0f};
   };
 

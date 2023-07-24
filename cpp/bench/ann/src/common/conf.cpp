@@ -123,7 +123,6 @@ void Configuration::parse_index_(const nlohmann::json& index_conf,
     for (const auto& param : conf.at("search_params")) {
       index.search_params.push_back(param);
     }
-    index.search_result_file = conf.at("search_result_file");
 
     indices_.push_back(index);
   }
