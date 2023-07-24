@@ -1,15 +1,17 @@
 {
   "dataset": {
     "name": "sift-128-euclidean",
-    "base_file": "/home/cjnolet/workspace/ann_data/sift-128-euclidean/base.fbin",
-    "query_file": "/home/cjnolet/workspace/ann_data/sift-128-euclidean/query.fbin",
+    "base_file": "sift-128-euclidean/base.fbin",
+    "query_file": "sift-128-euclidean/query.fbin",
+    "groundtruth_neighbors_file": "sift-128-euclidean/groundtruth.neighbors.ibin",
     "distance": "euclidean"
   },
+
   "search_basic_param": {
     "batch_size": 5000,
-    "k": 10,
-    "run_count": 3
+    "k": 10
   },
+
   "index": [
     {
       "name" : "hnswlib.M12",
@@ -27,8 +29,7 @@
         {"ef":400, "numThreads":1},
         {"ef":600, "numThreads":1},
         {"ef":800, "numThreads":1}
-      ],
-      "search_result_file" : "result/sift-128-euclidean/hnswlib/M12"
+      ]
     },
     {
       "name" : "hnswlib.M16",
@@ -46,8 +47,7 @@
         {"ef":400, "numThreads":1},
         {"ef":600, "numThreads":1},
         {"ef":800, "numThreads":1}
-      ],
-      "search_result_file" : "result/sift-128-euclidean/hnswlib/M16"
+      ]
     },
     {
       "name" : "hnswlib.M24",
@@ -65,8 +65,7 @@
         {"ef":400, "numThreads":1},
         {"ef":600, "numThreads":1},
         {"ef":800, "numThreads":1}
-      ],
-      "search_result_file" : "result/sift-128-euclidean/hnswlib/M24"
+      ]
     },
     {
       "name" : "hnswlib.M36",
@@ -84,234 +83,109 @@
         {"ef":400, "numThreads":1},
         {"ef":600, "numThreads":1},
         {"ef":800, "numThreads":1}
-      ],
-      "search_result_file" : "result/sift-128-euclidean/hnswlib/M36"
+      ]
     },
-
-
-
-
     {
       "name": "raft_bfknn",
       "algo": "raft_bfknn",
       "build_param": {},
       "file": "index/sift-128-euclidean/raft_bfknn/bfknn",
-      "search_params": [
-        {
-          "probe": 1
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_bfknn/bfknn"
+      "search_params": [{"probe": 1}]
     },
     {
       "name": "faiss_ivf_flat.nlist1024",
       "algo": "faiss_gpu_ivf_flat",
-      "build_param": {
-        "nlist": 1024
-      },
+      "build_param": {"nlist": 1024},
       "file": "index/sift-128-euclidean/faiss_ivf_flat/nlist1024",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_flat/nlist1024"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_flat.nlist2048",
       "algo": "faiss_gpu_ivf_flat",
-      "build_param": {
-        "nlist": 2048
-      },
+      "build_param": {"nlist": 2048},
       "file": "index/sift-128-euclidean/faiss_ivf_flat/nlist2048",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_flat/nlist2048"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_flat.nlist4096",
       "algo": "faiss_gpu_ivf_flat",
-      "build_param": {
-        "nlist": 4096
-      },
+      "build_param": {"nlist": 4096},
       "file": "index/sift-128-euclidean/faiss_ivf_flat/nlist4096",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_flat/nlist4096"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_flat.nlist8192",
       "algo": "faiss_gpu_ivf_flat",
-      "build_param": {
-        "nlist": 8192
-      },
+      "build_param": {"nlist": 8192},
       "file": "index/sift-128-euclidean/faiss_ivf_flat/nlist8192",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_flat/nlist8192"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_flat.nlist16384",
       "algo": "faiss_gpu_ivf_flat",
-      "build_param": {
-        "nlist": 16384
-      },
+      "build_param": {"nlist": 16384},
       "file": "index/sift-128-euclidean/faiss_ivf_flat/nlist16384",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        },
-        {
-          "nprobe": 2000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_flat/nlist16384"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000},
+        {"nprobe": 2000}
+      ]
     },
     {
       "name": "faiss_ivf_pq.M64-nlist1024",
       "algo": "faiss_gpu_ivf_pq",
-      "build_param": {
-        "nlist": 1024,
-        "M": 64,
-        "useFloat16": true,
-        "usePrecomputed": true
-      },
+      "build_param": {"nlist": 1024, "M": 64, "useFloat16": true, "usePrecomputed": true},
       "file": "index/sift-128-euclidean/faiss_ivf_pq/M64-nlist1024",
       "search_params": [
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_pq/M64-nlist1024"
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_pq.M64-nlist1024.noprecomp",
@@ -324,1028 +198,301 @@
       },
       "file": "index/sift-128-euclidean/faiss_ivf_pq/M64-nlist1024.noprecomp",
       "search_params": [
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_pq/M64-nlist1024"
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_sq.nlist1024-fp16",
       "algo": "faiss_gpu_ivf_sq",
-      "build_param": {
-        "nlist": 1024,
-        "quantizer_type": "fp16"
-      },
+      "build_param": {"nlist": 1024, "quantizer_type": "fp16"},
       "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist1024-fp16",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_sq/nlist1024-fp16"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_sq.nlist2048-fp16",
       "algo": "faiss_gpu_ivf_sq",
-      "build_param": {
-        "nlist": 2048,
-        "quantizer_type": "fp16"
-      },
+      "build_param": {"nlist": 2048, "quantizer_type": "fp16"},
       "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist2048-fp16",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_sq/nlist2048-fp16"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_sq.nlist4096-fp16",
       "algo": "faiss_gpu_ivf_sq",
-      "build_param": {
-        "nlist": 4096,
-        "quantizer_type": "fp16"
-      },
+      "build_param": {"nlist": 4096, "quantizer_type": "fp16"},
       "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist4096-fp16",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_sq/nlist4096-fp16"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_sq.nlist8192-fp16",
       "algo": "faiss_gpu_ivf_sq",
-      "build_param": {
-        "nlist": 8192,
-        "quantizer_type": "fp16"
-      },
+      "build_param": {"nlist": 8192, "quantizer_type": "fp16"},
       "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist8192-fp16",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_sq/nlist8192-fp16"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_sq.nlist16384-fp16",
       "algo": "faiss_gpu_ivf_sq",
-      "build_param": {
-        "nlist": 16384,
-        "quantizer_type": "fp16"
-      },
+      "build_param": {"nlist": 16384, "quantizer_type": "fp16"},
       "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist16384-fp16",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        },
-        {
-          "nprobe": 2000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_sq/nlist16384-fp16"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000},
+        {"nprobe": 2000}
+      ]
     },
     {
       "name": "faiss_ivf_sq.nlist1024-int8",
       "algo": "faiss_gpu_ivf_sq",
-      "build_param": {
-        "nlist": 1024,
-        "quantizer_type": "int8"
-      },
+      "build_param": {"nlist": 1024, "quantizer_type": "int8"},
       "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist1024-int8",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_sq/nlist1024-int8"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_sq.nlist2048-int8",
       "algo": "faiss_gpu_ivf_sq",
-      "build_param": {
-        "nlist": 2048,
-        "quantizer_type": "int8"
-      },
+      "build_param": {"nlist": 2048,"quantizer_type": "int8"},
       "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist2048-int8",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_sq/nlist2048-int8"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_sq.nlist4096-int8",
       "algo": "faiss_gpu_ivf_sq",
-      "build_param": {
-        "nlist": 4096,
-        "quantizer_type": "int8"
-      },
+      "build_param": {"nlist": 4096, "quantizer_type": "int8"},
       "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist4096-int8",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_sq/nlist4096-int8"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_sq.nlist8192-int8",
       "algo": "faiss_gpu_ivf_sq",
-      "build_param": {
-        "nlist": 8192,
-        "quantizer_type": "int8"
-      },
+      "build_param": {"nlist": 8192, "quantizer_type": "int8"},
       "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist8192-int8",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_sq/nlist8192-int8"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "faiss_ivf_sq.nlist16384-int8",
       "algo": "faiss_gpu_ivf_sq",
-      "build_param": {
-        "nlist": 16384,
-        "quantizer_type": "int8"
-      },
+      "build_param": {"nlist": 16384, "quantizer_type": "int8"},
       "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist16384-int8",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        },
-        {
-          "nprobe": 2000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_ivf_sq/nlist16384-int8"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000},
+        {"nprobe": 2000}
+      ]
     },
     {
       "name": "faiss_flat",
       "algo": "faiss_gpu_flat",
       "build_param": {},
       "file": "index/sift-128-euclidean/faiss_flat/flat",
-      "search_params": [
-        {}
-      ],
-      "search_result_file": "result/sift-128-euclidean/faiss_flat/flat"
-    },
-
-    {
-      "name": "raft_ivf_pq.dimpq128-cluster1024",
-      "algo": "raft_ivf_pq",
-      "build_param": {
-        "nlist": 1024,
-        "pq_dim": 128,
-        "ratio": 1,
-        "niter": 25
-      },
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq128-cluster1024",
-      "search_params": [
-        {
-          "k": 10,
-          "numProbes": 10,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 50,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 100,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 200,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 500,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 1024,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "half"
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_pq/dimpq128-cluster1024"
+      "search_params": [{}]
     },
     {
-      "name": "raft_ivf_pq.dimpq128-cluster1024-float-float",
+      "name": "raft_ivf_pq.dimpq64-bitpq8-cluster1K",
       "algo": "raft_ivf_pq",
-      "build_param": {
-        "nlist": 1024,
-        "pq_dim": 128,
-        "ratio": 1,
-        "niter": 25
-      },
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq128-cluster1024-float-float",
+      "build_param": {"niter": 25, "nlist": 1000, "pq_dim": 64, "pq_bits": 8, "ratio": 1},
+      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq64-bitpq8-cluster1K",
       "search_params": [
-        {
-          "k": 10,
-          "numProbes": 1,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 1,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 5,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 10,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 50,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 100,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 200,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 500,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 1024,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_pq/dimpq128-cluster1024-float-float"
+        { "numProbes": 20, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 30, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 40, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 50, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 100, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 200, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 500, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 1000, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 20, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 30, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 40, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 50, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 100, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 200, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 500, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 1000, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 20, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 30, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 40, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 50, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 100, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 200, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 500, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 1000, "internalDistanceDtype": "half", "smemLutDtype": "half" }
+      ]
     },
     {
-      "name": "raft_ivf_pq.dimpq128-cluster1024-float-half",
+      "name": "raft_ivf_pq.dimpq128-bitpq6-cluster1K",
       "algo": "raft_ivf_pq",
-      "build_param": {
-        "nlist": 1024,
-        "pq_dim": 128,
-        "ratio": 1,
-        "niter": 25
-      },
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq128-cluster1024-float-half",
+      "build_param": {"niter": 25, "nlist": 1000, "pq_dim": 128, "pq_bits": 6, "ratio": 1},
+      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq128-bitpq6-cluster1K",
       "search_params": [
-        {
-          "k": 10,
-          "numProbes": 10,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 50,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 100,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 200,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 500,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 1024,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_pq/dimpq128-cluster1024-float-half"
-    },
-    {
-      "name": "raft_ivf_pq.dimpq128-cluster1024-float-fp8",
-      "algo": "raft_ivf_pq",
-      "build_param": {
-        "nlist": 1024,
-        "pq_dim": 128,
-        "ratio": 1,
-        "niter": 25
-      },
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq128-cluster1024-float-fp8",
-      "search_params": [
-        {
-          "k": 10,
-          "numProbes": 10,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 50,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 100,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 200,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 500,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 1024,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_pq/dimpq128-cluster1024-float-fp8"
-    },
-    {
-      "name": "raft_ivf_pq.dimpq64-cluster1024-float-fp8",
-      "algo": "raft_ivf_pq",
-      "build_param": {
-        "nlist": 1024,
-        "pq_dim": 64,
-        "ratio": 1,
-        "niter": 25
-      },
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq64-cluster1024-float-fp8",
-      "search_params": [
-        {
-          "k": 10,
-          "numProbes": 10,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 50,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 100,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 200,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 500,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 1024,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_pq/dimpq64-cluster1024-float-fp8"
-    },
-    {
-      "name": "raft_ivf_pq.dimpq64-cluster1024-float-half",
-      "algo": "raft_ivf_pq",
-      "build_param": {
-        "nlist": 1024,
-        "pq_dim": 64,
-        "ratio": 1,
-        "niter": 25
-      },
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq64-cluster1024-float-half",
-      "search_params": [
-        {
-          "k": 10,
-          "numProbes": 10,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 50,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 100,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 200,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 500,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        },
-        {
-          "k": 10,
-          "numProbes": 1024,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "half"
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_pq/dimpq64-cluster1024-float-half"
-    },
-    {
-      "name": "raft_ivf_pq.dimpq32-cluster1024-float-fp8",
-      "algo": "raft_ivf_pq",
-      "build_param": {
-        "nlist": 1024,
-        "pq_dim": 32,
-        "ratio": 1,
-        "niter": 25
-      },
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq32-cluster1024-float-fp8",
-      "search_params": [
-        {
-          "k": 10,
-          "numProbes": 10,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 50,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 100,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 200,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 500,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 1024,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_pq/dimpq32-cluster1024-float-fp8"
-    },
-    {
-      "name": "raft_ivf_pq.dimpq16-cluster1024-float-fp8",
-      "algo": "raft_ivf_pq",
-      "build_param": {
-        "nlist": 1024,
-        "pq_dim": 16,
-        "ratio": 1,
-        "niter": 25
-      },
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq16-cluster1024-float-fp8",
-      "search_params": [
-        {
-          "k": 10,
-          "numProbes": 10,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 50,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 100,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 200,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 500,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        },
-        {
-          "k": 10,
-          "numProbes": 1024,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "fp8"
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_pq/dimpq16-cluster1024-float-fp8"
-    },
-    {
-      "name": "raft_ivf_pq.dimpq128-cluster1024-half-float",
-      "algo": "raft_ivf_pq",
-      "build_param": {
-        "nlist": 1024,
-        "pq_dim": 128,
-        "ratio": 1,
-        "niter": 25
-      },
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq128-cluster1024-half-float",
-      "search_params": [
-        {
-          "k": 10,
-          "numProbes": 10,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 50,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 100,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 200,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 500,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 1024,
-          "internalDistanceDtype": "half",
-          "smemLutDtype": "float"
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_pq/dimpq128-cluster1024-half-float"
-    },
-    {
-      "name": "raft_ivf_pq.dimpq512-cluster1024-float-float",
-      "algo": "raft_ivf_pq",
-      "build_param": {
-        "nlist": 1024,
-        "pq_dim": 512,
-        "ratio": 1,
-        "niter": 25
-      },
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq512-cluster1024-float-float",
-      "search_params": [
-        {
-          "k": 10,
-          "numProbes": 10,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 50,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 100,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 200,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 500,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        },
-        {
-          "k": 10,
-          "numProbes": 1024,
-          "internalDistanceDtype": "float",
-          "smemLutDtype": "float"
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_pq/dimpq512-cluster1024-float-float"
+        { "numProbes": 20, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 30, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 40, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 50, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 100, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 200, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 500, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 1000, "internalDistanceDtype": "float", "smemLutDtype": "float" },
+        { "numProbes": 20, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 30, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 40, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 50, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 100, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 200, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 500, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 1000, "internalDistanceDtype": "float", "smemLutDtype": "fp8" },
+        { "numProbes": 20, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 30, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 40, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 50, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 100, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 200, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 500, "internalDistanceDtype": "half", "smemLutDtype": "half" },
+        { "numProbes": 1000, "internalDistanceDtype": "half", "smemLutDtype": "half" }
+      ]
     },
     {
       "name": "raft_ivf_flat.nlist1024",
       "algo": "raft_ivf_flat",
-      "build_param": {
-        "nlist": 1024,
-        "ratio": 1,
-        "niter": 25
-      },
+      "build_param": {"nlist": 1024, "ratio": 1, "niter": 25},
       "file": "index/sift-128-euclidean/raft_ivf_flat/nlist1024",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_flat/nlist1024"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000}
+      ]
     },
     {
       "name": "raft_ivf_flat.nlist16384",
       "algo": "raft_ivf_flat",
-      "build_param": {
-        "nlist": 16384,
-        "ratio": 2,
-        "niter": 20
-      },
+      "build_param": {"nlist": 16384, "ratio": 2, "niter": 20},
       "file": "index/sift-128-euclidean/raft_ivf_flat/nlist16384",
       "search_params": [
-        {
-          "nprobe": 1
-        },
-        {
-          "nprobe": 5
-        },
-        {
-          "nprobe": 10
-        },
-        {
-          "nprobe": 50
-        },
-        {
-          "nprobe": 100
-        },
-        {
-          "nprobe": 200
-        },
-        {
-          "nprobe": 500
-        },
-        {
-          "nprobe": 1000
-        },
-        {
-          "nprobe": 2000
-        }
-      ],
-      "search_result_file": "result/sift-128-euclidean/raft_ivf_flat/nlist16384"
+        {"nprobe": 1},
+        {"nprobe": 5},
+        {"nprobe": 10},
+        {"nprobe": 50},
+        {"nprobe": 100},
+        {"nprobe": 200},
+        {"nprobe": 500},
+        {"nprobe": 1000},
+        {"nprobe": 2000}
+      ]
     },
-
     {
       "name" : "cagra.dim32",
       "algo" : "raft_cagra",
-      "build_param": {
-        "index_dim" : 32
-      },
+      "build_param": {"index_dim" : 32},
       "file" : "index/sift-128-euclidean/cagra/dim32",
       "search_params" : [
         {"itopk": 32},
         {"itopk": 64},
         {"itopk": 128}
-      ],
-      "search_result_file" : "result/sift-128-euclidean/cagra/dim32"
+      ]
     },
-
     {
       "name" : "cagra.dim64",
       "algo" : "raft_cagra",
-      "build_param": {
-        "index_dim" : 64
-      },
+      "build_param": {"index_dim" : 64},
       "file" : "index/sift-128-euclidean/cagra/dim64",
       "search_params" : [
         {"itopk": 32},
         {"itopk": 64},
         {"itopk": 128}
-      ],
-      "search_result_file" : "result/sift-128-euclidean/cagra/dim64"
+      ]
     }
   ]
 }

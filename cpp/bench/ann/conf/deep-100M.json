@@ -4,13 +4,13 @@
     "base_file" : "data/deep-1B/base.1B.fbin",
     "subset_size" : 100000000,
     "query_file" : "data/deep-1B/query.public.10K.fbin",
+    "groundtruth_neighbors_file": "deep-100M/groundtruth.neighbors.ibin",
     "distance" : "euclidean"
   },
 
   "search_basic_param" : {
     "batch_size" : 10000,
-    "k" : 10,
-    "run_count" : 2
+    "k" : 10
   },
 
   "index" : [
@@ -30,8 +30,7 @@
         {"ef":400, "numThreads":1},
         {"ef":600, "numThreads":1},
         {"ef":800, "numThreads":1}
-      ],
-      "search_result_file" : "result/deep-100M/hnswlib/M12"
+      ]
     },
     {
       "name" : "hnswlib.M16",
@@ -49,8 +48,7 @@
         {"ef":400, "numThreads":1},
         {"ef":600, "numThreads":1},
         {"ef":800, "numThreads":1}
-      ],
-      "search_result_file" : "result/deep-100M/hnswlib/M16"
+      ]
     },
     {
       "name" : "hnswlib.M24",
@@ -68,8 +66,7 @@
         {"ef":400, "numThreads":1},
         {"ef":600, "numThreads":1},
         {"ef":800, "numThreads":1}
-      ],
-      "search_result_file" : "result/deep-100M/hnswlib/M24"
+      ]
     },
     {
       "name" : "hnswlib.M36",
@@ -87,8 +84,7 @@
         {"ef":400, "numThreads":1},
         {"ef":600, "numThreads":1},
         {"ef":800, "numThreads":1}
-      ],
-      "search_result_file" : "result/deep-100M/hnswlib/M36"
+      ]
     },
     {
       "name" : "faiss_ivf_flat.nlist50K",
@@ -104,8 +100,7 @@
         {"nprobe":200},
         {"nprobe":500},
         {"nprobe":1000}
-      ],
-      "search_result_file" : "result/deep-100M/faiss_ivf_flat/nlist50K"
+      ]
     },
     {
       "name" : "faiss_ivf_flat.nlist100K",
@@ -121,8 +116,7 @@
         {"nprobe":200},
         {"nprobe":500},
         {"nprobe":1000}
-      ],
-      "search_result_file" : "result/deep-100M/faiss_ivf_flat/nlist100K"
+      ]
     },
     {
       "name" : "faiss_ivf_flat.nlist200K",
@@ -138,11 +132,8 @@
         {"nprobe":200},
         {"nprobe":500},
         {"nprobe":1000}
-      ],
-      "search_result_file" : "result/deep-100M/faiss_ivf_flat/nlist200K"
+      ]
     },
-
-
     {
       "name" : "faiss_ivf_pq.M48-nlist16K",
       "algo" : "faiss_gpu_ivf_pq",
@@ -157,8 +148,7 @@
         {"nprobe":100},
         {"nprobe":200},
         {"nprobe":500}
-      ],
-      "search_result_file" : "result/deep-100M/faiss_ivf_pq/M48-nlist16K"
+      ]
     },
     {
       "name" : "faiss_ivf_pq.M48-nlist50K",
@@ -174,8 +164,7 @@
         {"nprobe":200},
         {"nprobe":500},
         {"nprobe":1000}
-      ],
-      "search_result_file" : "result/deep-100M/faiss_ivf_pq/M48-nlist50K"
+      ]
     },
     {
       "name" : "faiss_ivf_pq.M48-nlist100K",
@@ -191,11 +180,8 @@
         {"nprobe":200},
         {"nprobe":500},
         {"nprobe":1000}
-      ],
-      "search_result_file" : "result/deep-100M/faiss_ivf_pq/M48-nlist100K"
+      ]
     },
-
-
     {
       "name" : "ivf_flat.nlist100K",
       "algo" : "ivf_flat",
@@ -214,10 +200,8 @@
         {"max_batch":10000, "max_k":10, "nprobe":200},
         {"max_batch":10000, "max_k":10, "nprobe":500},
         {"max_batch":10000, "max_k":10, "nprobe":1000}
-      ],
-      "search_result_file" : "result/deep-100M/ivf_flat/nlist100K"
+      ]
     },
-
     {
       "name" : "cagra.dim32",
       "algo" : "raft_cagra",
@@ -229,11 +213,8 @@
         {"itopk": 32},
         {"itopk": 64},
         {"itopk": 128}
-      ],
-      "search_result_file" : "result/deep-100M/cagra/dim32"
+      ]
     },
-
-
     {
       "name" : "cagra.dim64",
       "algo" : "raft_cagra",
@@ -245,8 +226,7 @@
         {"itopk": 32},
         {"itopk": 64},
         {"itopk": 128}
-      ],
-      "search_result_file" : "result/deep-100M/cagra/dim64"
+      ]
     }
   ]
 }
