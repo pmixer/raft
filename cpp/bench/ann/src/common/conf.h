@@ -36,7 +36,6 @@ class Configuration {
 
     int batch_size;
     int k;
-    int run_count;
     std::vector<nlohmann::json> search_params;
     float refine_ratio{0.0f};
   };

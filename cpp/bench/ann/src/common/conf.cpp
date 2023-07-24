@@ -91,7 +91,6 @@ void Configuration::parse_index_(const nlohmann::json& index_conf,
 {
   const int batch_size = search_basic_conf.at("batch_size");
   const int k          = search_basic_conf.at("k");
-  const int run_count  = search_basic_conf.at("run_count");
 
   for (const auto& conf : index_conf) {
     Index index;
@@ -101,7 +100,6 @@ void Configuration::parse_index_(const nlohmann::json& index_conf,
     index.file        = conf.at("file");
     index.batch_size  = batch_size;
     index.k           = k;
-    index.run_count   = run_count;
 
     if (conf.contains("multigpu")) {
       for (auto it : conf.at("multigpu")) {
