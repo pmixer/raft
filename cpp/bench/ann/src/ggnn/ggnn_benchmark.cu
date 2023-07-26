@@ -84,7 +84,6 @@ template <typename T>
 std::unique_ptr<raft::bench::ann::ANN<T>> create_algo(const std::string& algo,
                                                       const std::string& distance,
                                                       int dim,
-                                                      float refine_ratio,
                                                       const nlohmann::json& conf,
                                                       const std::vector<int>& dev_list)
 {
@@ -101,7 +100,6 @@ std::unique_ptr<raft::bench::ann::ANN<T>> create_algo(const std::string& algo,
   if (algo == "ggnn") { ann = make_algo<T, raft::bench::ann::Ggnn>(metric, dim, conf); }
   if (!ann) { throw std::runtime_error("invalid algo: '" + algo + "'"); }
 
-  if (refine_ratio > 1.0) {}
   return ann;
 }
 

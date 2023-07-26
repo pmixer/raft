@@ -37,7 +37,6 @@ class Configuration {
     int batch_size;
     int k;
     std::vector<nlohmann::json> search_params;
-    float refine_ratio{0.0f};
   };
 
   struct DatasetConf {

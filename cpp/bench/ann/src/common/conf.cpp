@@ -110,15 +110,22 @@ void Configuration::parse_index_(const nlohmann::json& index_conf,
       index.build_param["multigpu"] = conf["multigpu"];
     }
 
-    if (conf.contains("refine_ratio")) {
-      float refine_ratio = conf.at("refine_ratio");
-      if (refine_ratio <= 1.0f) {
-        throw runtime_error("'" + index.name + "': refine_ratio should > 1.0");
-      }
-      index.refine_ratio = refine_ratio;
-    }
+    for (auto param : conf.at("search_params")) {
+      /*  ### Special parameters for backward compatibility ###
 
-    for (const auto& param : conf.at("search_params")) {
+        - Local values of `k` and `n_queries` take priority.
+        - The legacy "batch_size" renamed to `n_queries`.
+        - Basic search params are used otherwise.
+      */
+      if (!param.contains("k")) { param["k"] = k; }
+      if (!param.contains("n_queries")) {
+        if (param.contains("batch_size")) {
+          param["n_queries"] = param["batch_size"];
+          param.erase("batch_size");
+        } else {
+          param["n_queries"] = batch_size;
+        }
+      }
       index.search_params.push_back(param);
     }
 

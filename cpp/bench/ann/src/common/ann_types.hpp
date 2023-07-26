@@ -36,7 +36,6 @@ struct AlgoProperty {
   MemoryType dataset_memory_type;
   // neighbors/distances should have same memory type as queries
   MemoryType query_memory_type;
-  bool need_dataset_when_search;
 };
 
 template <typename T>
@@ -44,6 +43,7 @@ class ANN {
  public:
   struct AnnSearchParam {
     virtual ~AnnSearchParam() = default;
+    [[nodiscard]] virtual auto needs_dataset() const -> bool { return false; };
   };
 
   ANN(Metric metric, int dim) : metric_(metric), dim_(dim) {}

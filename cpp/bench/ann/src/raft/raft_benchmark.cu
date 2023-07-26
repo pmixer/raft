@@ -120,6 +120,10 @@ void parse_search_param(const nlohmann::json& conf,
     // set half as default
     param.pq_param.lut_dtype = CUDA_R_16F;
   }
+  if (conf.contains("refine_ratio")) {
+    param.refine_ratio = conf.at("refine_ratio");
+    if (param.refine_ratio < 1.0f) { throw std::runtime_error("refine_ratio should be >= 1.0"); }
+  }
 }
 #endif
 
@@ -151,7 +155,6 @@ template <typename T>
 std::unique_ptr<raft::bench::ann::ANN<T>> create_algo(const std::string& algo,
                                                       const std::string& distance,
                                                       int dim,
-                                                      float refine_ratio,
                                                       const nlohmann::json& conf,
                                                       const std::vector<int>& dev_list)
 {
@@ -180,8 +183,7 @@ std::unique_ptr<raft::bench::ann::ANN<T>> create_algo(const std::string& algo,
   if (algo == "raft_ivf_pq") {
     typename raft::bench::ann::RaftIvfPQ<T, int64_t>::BuildParam param;
     parse_build_param<T, int64_t>(conf, param);
-    ann =
-      std::make_unique<raft::bench::ann::RaftIvfPQ<T, int64_t>>(metric, dim, param, refine_ratio);
+    ann = std::make_unique<raft::bench::ann::RaftIvfPQ<T, int64_t>>(metric, dim, param);
   }
 #endif
 #ifdef RAFT_ANN_BENCH_USE_RAFT_CAGRA
@@ -193,7 +195,6 @@ std::unique_ptr<raft::bench::ann::ANN<T>> create_algo(const std::string& algo,
 #endif
   if (!ann) { throw std::runtime_error("invalid algo: '" + algo + "'"); }
 
-  if (refine_ratio > 1.0) {}
   return ann;
 }
 

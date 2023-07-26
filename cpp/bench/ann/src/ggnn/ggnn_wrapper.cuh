@@ -50,6 +50,7 @@ class Ggnn : public ANN<T> {
     int max_iterations{400};
     int cache_size{512};
     int sorted_size{256};
+    auto needs_dataset() const -> bool override { return true; }
   };
 
   Ggnn(Metric metric, int dim, const BuildParam& param);
@@ -138,9 +139,8 @@ class GgnnImpl : public ANN<T> {
   AlgoProperty get_property() const override
   {
     AlgoProperty property;
-    property.dataset_memory_type      = MemoryType::Device;
-    property.query_memory_type        = MemoryType::Device;
-    property.need_dataset_when_search = true;
+    property.dataset_memory_type = MemoryType::Device;
+    property.query_memory_type   = MemoryType::Device;
     return property;
   }
 

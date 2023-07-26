@@ -48,6 +48,7 @@ class RaftCagra : public ANN<T> {
 
   struct SearchParam : public AnnSearchParam {
     raft::neighbors::experimental::cagra::search_params p;
+    auto needs_dataset() const -> bool override { return true; }
   };
 
   using BuildParam = raft::neighbors::cagra::index_params;
@@ -82,9 +83,8 @@ class RaftCagra : public ANN<T> {
   AlgoProperty get_property() const override
   {
     AlgoProperty property;
-    property.dataset_memory_type      = MemoryType::Host;
-    property.query_memory_type        = MemoryType::Device;
-    property.need_dataset_when_search = true;
+    property.dataset_memory_type = MemoryType::Host;
+    property.query_memory_type   = MemoryType::Device;
     return property;
   }
   void save(const std::string& file) const override;

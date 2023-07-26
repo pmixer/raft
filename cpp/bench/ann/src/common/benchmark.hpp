@@ -30,7 +30,6 @@
 #include <numeric>
 #include <string>
 #include <unistd.h>
-#include <unordered_set>
 #include <vector>
 
 namespace raft::bench::ann {
@@ -72,12 +71,8 @@ void bench_build(::benchmark::State& state,
     }
   }
 
-  const auto algo = ann::create_algo<T>(index.algo,
-                                        dataset->distance(),
-                                        dataset->dim(),
-                                        index.refine_ratio,
-                                        index.build_param,
-                                        index.dev_list);
+  const auto algo = ann::create_algo<T>(
+    index.algo, dataset->distance(), dataset->dim(), index.build_param, index.dev_list);
 
   const auto algo_property = algo->get_property();
 
@@ -120,21 +115,19 @@ void bench_search(::benchmark::State& state,
                   Configuration::Index index,
                   std::size_t search_param_ix)
 {
-  const std::uint32_t k = index.k;
-  // Amount of data processes in one go
-  const std::size_t batch_size = index.batch_size;
-  // Round down the query data to a multiple of the batch size to loop over full batches of data
-  const std::size_t query_set_size = (dataset->query_set_size() / batch_size) * batch_size;
+  const auto& sp_json = index.search_params[search_param_ix];
 
-  const auto algo = ann::create_algo<T>(index.algo,
-                                        dataset->distance(),
-                                        dataset->dim(),
-                                        index.refine_ratio,
-                                        index.build_param,
-                                        index.dev_list);
-  const auto p_param =
-    ann::create_search_param<T>(index.algo, index.search_params[search_param_ix]);
-  algo->set_search_param(*p_param);
+  // NB: `k` and `n_queries` are guaranteed to be populated in conf.cpp
+  const std::uint32_t k = sp_json["k"];
+  // Amount of data processes in one go
+  const std::size_t n_queries = sp_json["n_queries"];
+  // Round down the query data to a multiple of the batch size to loop over full batches of data
+  const std::size_t query_set_size = (dataset->query_set_size() / n_queries) * n_queries;
+
+  const auto algo = ann::create_algo<T>(
+    index.algo, dataset->distance(), dataset->dim(), index.build_param, index.dev_list);
+  const auto search_param = ann::create_search_param<T>(index.algo, sp_json);
+  algo->set_search_param(*search_param);
 
   if (!file_exists(index.file)) {
     state.SkipWithError("Index file is missing. Run the benchmark in the build mode first.");
@@ -147,7 +140,7 @@ void bench_search(::benchmark::State& state,
   buf<float> distances{algo_property.query_memory_type, k * query_set_size};
   buf<std::size_t> neighbors{algo_property.query_memory_type, k * query_set_size};
 
-  if (algo_property.need_dataset_when_search) {
+  if (search_param->needs_dataset()) {
     try {
       algo->set_search_dataset(dataset->base_set(algo_property.dataset_memory_type),
                                dataset->base_set_size());
@@ -167,7 +160,7 @@ void bench_search(::benchmark::State& state,
     // run the search
     try {
       algo->search(query_set + batch_offset * dataset->dim(),
-                   batch_size,
+                   n_queries,
                    k,
                    neighbors.data + batch_offset * k,
                    distances.data + batch_offset * k,
@@ -176,14 +169,14 @@ void bench_search(::benchmark::State& state,
       state.SkipWithError(std::string(e.what()));
     }
     // advance to the next batch
-    batch_offset = (batch_offset + batch_size) % query_set_size;
-    queries_processed += batch_size;
+    batch_offset = (batch_offset + n_queries) % query_set_size;
+    queries_processed += n_queries;
   }
   state.SetItemsProcessed(queries_processed);
   state.counters.insert({{"GPU Time", gpu_timer.total_time() / state.iterations()},
                          {"GPU QPS", queries_processed / gpu_timer.total_time()},
                          {"k", k},
-                         {"n_queries", batch_size}});
+                         {"n_queries", n_queries}});
   dump_parameters(state, index.search_params[search_param_ix]);
   if (state.skipped()) { return; }
 
@@ -324,10 +317,12 @@ inline auto parse_string_flag(const char* arg, const char* pat, std::string& res
 
 inline auto run_main(int argc, char** argv) -> int
 {
-  bool force_overwrite = false;
-  bool build_mode      = false;
-  bool search_mode     = false;
-  std::string prefix   = "data";
+  bool force_overwrite        = false;
+  bool build_mode             = false;
+  bool search_mode            = false;
+  std::string prefix          = "data";
+  std::string new_override_kv = "";
+  std::vector<std::string> override_kv{};
 
   char arg0_default[] = "benchmark";  // NOLINT
   char* args_default  = arg0_default;
@@ -347,7 +342,12 @@ inline auto run_main(int argc, char** argv) -> int
     if (parse_bool_flag(argv[i], "--overwrite", force_overwrite) ||
         parse_bool_flag(argv[i], "--build", build_mode) ||
         parse_bool_flag(argv[i], "--search", search_mode) ||
-        parse_string_flag(argv[i], "--data_prefix", prefix)) {
+        parse_string_flag(argv[i], "--data_prefix", prefix) ||
+        parse_string_flag(argv[i], "--data_prefix", new_override_kv)) {
+      if (!new_override_kv.empty()) {
+        override_kv.push_back(new_override_kv);
+        new_override_kv = "";
+      }
       for (int j = i; j < argc - 1; j++) {
         argv[j] = argv[j + 1];
       }

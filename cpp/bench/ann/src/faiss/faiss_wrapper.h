@@ -102,9 +102,8 @@ class FaissGpu : public ANN<T> {
   {
     AlgoProperty property;
     // to enable building big dataset which is larger than GPU memory
-    property.dataset_memory_type      = MemoryType::Host;
-    property.query_memory_type        = MemoryType::Device;
-    property.need_dataset_when_search = false;
+    property.dataset_memory_type = MemoryType::Host;
+    property.query_memory_type   = MemoryType::Device;
     return property;
   }
 
