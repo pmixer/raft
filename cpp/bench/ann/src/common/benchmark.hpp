@@ -275,6 +275,9 @@ void dispatch_benchmark(const Configuration& conf,
                         std::string prefix,
                         kv_series override_kv)
 {
+  for (auto [key, value] : cuda_info()) {
+    ::benchmark::AddCustomContext(key, value);
+  }
   const auto dataset_conf = conf.get_dataset_conf();
   auto base_file          = combine_path(prefix, dataset_conf.base_file);
   auto query_file         = combine_path(prefix, dataset_conf.query_file);

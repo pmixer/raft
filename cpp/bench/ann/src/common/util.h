@@ -138,6 +138,23 @@ struct cuda_timer {
   }
 };
 
+inline auto cuda_info()
+{
+  int dev;
+  cudaDeviceProp device_prop;
+  cudaGetDevice(&dev);
+  cudaGetDeviceProperties(&device_prop, dev);
+  std::vector<std::tuple<std::string, std::string>> props;
+  props.emplace_back("gpu_name", std::string(device_prop.name));
+  props.emplace_back("gpu_sm_count", std::to_string(device_prop.multiProcessorCount));
+  props.emplace_back("gpu_sm_freq", std::to_string(device_prop.clockRate * 1e3));
+  props.emplace_back("gpu_mem_freq", std::to_string(device_prop.memoryClockRate * 1e3));
+  props.emplace_back("gpu_mem_bus_width", std::to_string(device_prop.memoryBusWidth));
+  props.emplace_back("gpu_mem_global_size", std::to_string(device_prop.totalGlobalMem));
+  props.emplace_back("gpu_mem_shared_size", std::to_string(device_prop.sharedMemPerMultiprocessor));
+  return props;
+}
+
 std::vector<std::string> split(const std::string& s, char delimiter);
 
 bool file_exists(const std::string& filename);
