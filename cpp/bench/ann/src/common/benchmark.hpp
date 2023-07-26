@@ -34,7 +34,33 @@
 
 namespace raft::bench::ann {
 
-void dump_parameters(::benchmark::State& state, nlohmann::json params)
+using kv_series = std::vector<std::tuple<std::string, std::vector<nlohmann::json>>>;
+
+inline auto apply_overrides(const std::vector<nlohmann::json>& configs,
+                            const kv_series& overrides,
+                            std::size_t override_idx = 0) -> std::vector<nlohmann::json>
+{
+  if (override_idx >= overrides.size()) { return configs; }
+  auto rec_configs = apply_overrides(configs, overrides, override_idx + 1);
+  auto [key, vals] = overrides[override_idx];
+  std::vector<nlohmann::json> results{};
+  for (const auto& val : vals) {
+    for (auto rc : rec_configs) {
+      rc[key] = val;
+      results.push_back(rc);
+    }
+  }
+  return results;
+}
+
+inline auto apply_overrides(const nlohmann::json& config,
+                            const kv_series& overrides,
+                            std::size_t override_idx = 0)
+{
+  return apply_overrides(std::vector{config}, overrides, 0);
+}
+
+inline void dump_parameters(::benchmark::State& state, nlohmann::json params)
 {
   std::string label = "";
   bool label_empty  = true;
@@ -234,7 +260,11 @@ inline void printf_usage()
           "            one and only one of --build and --search should be specified\n"
           "  --overwrite: force overwriting existing index files\n"
           "  --data_prefix=<prefix>:"
-          " prepend <prefix> to dataset file paths specified in the <conf>.json.\n");
+          " prepend <prefix> to dataset file paths specified in the <conf>.json.\n"
+          "  --override_kv=<key:value1:value2:...:valueN>:"
+          " override a build/search key one or more times multiplying the number of configurations;"
+          " you can use this parameter multiple times to get the Cartesian product of benchmark"
+          " configs.\n");
 }
 
 template <typename T>
@@ -242,7 +272,8 @@ void dispatch_benchmark(const Configuration& conf,
                         bool force_overwrite,
                         bool build_mode,
                         bool search_mode,
-                        std::string prefix)
+                        std::string prefix,
+                        kv_series override_kv)
 {
   const auto dataset_conf = conf.get_dataset_conf();
   auto base_file          = combine_path(prefix, dataset_conf.base_file);
@@ -268,7 +299,15 @@ void dispatch_benchmark(const Configuration& conf,
       log_warn("Dataset file '%s' does not exist; benchmarking index building is impossible.",
                base_file.c_str());
     }
-    register_build<T>(dataset, indices, force_overwrite);
+    std::vector<Configuration::Index> more_indices{};
+    for (auto& index : indices) {
+      for (auto param : apply_overrides(index.build_param, override_kv)) {
+        auto modified_index        = index;
+        modified_index.build_param = param;
+        more_indices.push_back(modified_index);
+      }
+    }
+    register_build<T>(dataset, more_indices, force_overwrite);
   } else if (search_mode) {
     if (file_exists(query_file)) {
       log_info("Using the query file '%s'", query_file.c_str());
@@ -291,6 +330,9 @@ void dispatch_benchmark(const Configuration& conf,
     } else {
       log_warn("Query file '%s' does not exist; benchmarking search is impossible.",
                query_file.c_str());
+    }
+    for (auto& index : indices) {
+      index.search_params = apply_overrides(index.search_params, override_kv);
     }
     register_search<T>(dataset, indices);
   }
@@ -322,7 +364,7 @@ inline auto run_main(int argc, char** argv) -> int
   bool search_mode            = false;
   std::string prefix          = "data";
   std::string new_override_kv = "";
-  std::vector<std::string> override_kv{};
+  kv_series override_kv{};
 
   char arg0_default[] = "benchmark";  // NOLINT
   char* args_default  = arg0_default;
@@ -343,9 +385,15 @@ inline auto run_main(int argc, char** argv) -> int
         parse_bool_flag(argv[i], "--build", build_mode) ||
         parse_bool_flag(argv[i], "--search", search_mode) ||
         parse_string_flag(argv[i], "--data_prefix", prefix) ||
-        parse_string_flag(argv[i], "--data_prefix", new_override_kv)) {
+        parse_string_flag(argv[i], "--override_kv", new_override_kv)) {
       if (!new_override_kv.empty()) {
-        override_kv.push_back(new_override_kv);
+        auto kvv = split(new_override_kv, ':');
+        auto key = kvv[0];
+        std::vector<nlohmann::json> vals{};
+        for (std::size_t j = 1; j < kvv.size(); j++) {
+          vals.push_back(nlohmann::json::parse(kvv[j]));
+        }
+        override_kv.emplace_back(key, vals);
         new_override_kv = "";
       }
       for (int j = i; j < argc - 1; j++) {
@@ -371,11 +419,13 @@ inline auto run_main(int argc, char** argv) -> int
   std::string dtype = conf.get_dataset_conf().dtype;
 
   if (dtype == "float") {
-    dispatch_benchmark<float>(conf, force_overwrite, build_mode, search_mode, prefix);
+    dispatch_benchmark<float>(conf, force_overwrite, build_mode, search_mode, prefix, override_kv);
   } else if (dtype == "uint8") {
-    dispatch_benchmark<std::uint8_t>(conf, force_overwrite, build_mode, search_mode, prefix);
+    dispatch_benchmark<std::uint8_t>(
+      conf, force_overwrite, build_mode, search_mode, prefix, override_kv);
   } else if (dtype == "int8") {
-    dispatch_benchmark<std::int8_t>(conf, force_overwrite, build_mode, search_mode, prefix);
+    dispatch_benchmark<std::int8_t>(
+      conf, force_overwrite, build_mode, search_mode, prefix, override_kv);
   } else {
     log_error("datatype '%s' is not supported", dtype.c_str());
     return -1;
