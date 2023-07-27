@@ -41,12 +41,26 @@ inline auto apply_overrides(const std::vector<nlohmann::json>& configs,
                             const kv_series& overrides,
                             std::size_t override_idx = 0) -> std::vector<nlohmann::json>
 {
-  if (override_idx >= overrides.size()) { return configs; }
+  std::vector<nlohmann::json> results{};
+  if (override_idx >= overrides.size()) {
+    auto n = configs.size();
+    for (size_t i = 0; i < n; i++) {
+      auto c               = configs[i];
+      c["override_suffix"] = n > 1 ? "/" + std::to_string(i) : "";
+      results.push_back(c);
+    }
+    return results;
+  }
   auto rec_configs = apply_overrides(configs, overrides, override_idx + 1);
   auto [key, vals] = overrides[override_idx];
-  std::vector<nlohmann::json> results{};
-  for (const auto& val : vals) {
+  auto n           = vals.size();
+  for (size_t i = 0; i < n; i++) {
+    const auto& val = vals[i];
     for (auto rc : rec_configs) {
+      if (n > 1) {
+        rc["override_suffix"] =
+          static_cast<std::string>(rc["override_suffix"]) + "/" + std::to_string(i);
+      }
       rc[key] = val;
       results.push_back(rc);
     }
@@ -135,8 +149,13 @@ void register_build(std::shared_ptr<const Dataset<T>> dataset,
                     bool force_overwrite)
 {
   for (auto index : indices) {
-    auto* b =
-      ::benchmark::RegisterBenchmark(index.name, bench_build<T>, dataset, index, force_overwrite);
+    auto suf      = static_cast<std::string>(index.build_param["override_suffix"]);
+    auto file_suf = suf;
+    index.build_param.erase("override_suffix");
+    std::replace(file_suf.begin(), file_suf.end(), '/', '-');
+    index.file += file_suf;
+    auto* b = ::benchmark::RegisterBenchmark(
+      index.name + suf, bench_build<T>, dataset, index, force_overwrite);
     b->Unit(benchmark::kSecond);
   }
 }
@@ -250,8 +269,10 @@ void register_search(std::shared_ptr<const Dataset<T>> dataset,
 {
   for (auto index : indices) {
     for (std::size_t i = 0; i < index.search_params.size(); i++) {
-      auto* b = ::benchmark::RegisterBenchmark(
-        index.name + "/" + std::to_string(i), bench_search<T>, dataset, index, i);
+      auto suf = static_cast<std::string>(index.search_params[i]["override_suffix"]);
+      index.search_params[i].erase("override_suffix");
+      auto* b =
+        ::benchmark::RegisterBenchmark(index.name + suf, bench_search<T>, dataset, index, i);
       b->Unit(benchmark::kMillisecond);
     }
   }
