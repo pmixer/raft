@@ -19,7 +19,6 @@
 
 #ifndef CPU_ONLY
 #include <cuda_fp16.h>
-#include <raft/util/cudart_utils.hpp>
 #else
 typedef uint16_t half;
 #endif
@@ -337,9 +336,8 @@ const T* Dataset<T>::base_set_on_gpu() const
 #ifndef CPU_ONLY
   if (!d_base_set_) {
     base_set();
-    RAFT_CUDA_TRY(cudaMalloc((void**)&d_base_set_, base_set_size() * dim() * sizeof(T)));
-    RAFT_CUDA_TRY(cudaMemcpy(
-      d_base_set_, base_set_, base_set_size() * dim() * sizeof(T), cudaMemcpyHostToDevice));
+    cudaMalloc((void**)&d_base_set_, base_set_size() * dim() * sizeof(T));
+    cudaMemcpy(d_base_set_, base_set_, base_set_size() * dim() * sizeof(T), cudaMemcpyHostToDevice);
   }
 #endif
   return d_base_set_;
@@ -351,9 +349,9 @@ const T* Dataset<T>::query_set_on_gpu() const
 #ifndef CPU_ONLY
   if (!d_query_set_) {
     query_set();
-    RAFT_CUDA_TRY(cudaMalloc((void**)&d_query_set_, query_set_size() * dim() * sizeof(T)));
-    RAFT_CUDA_TRY(cudaMemcpy(
-      d_query_set_, query_set_, query_set_size() * dim() * sizeof(T), cudaMemcpyHostToDevice));
+    cudaMalloc((void**)&d_query_set_, query_set_size() * dim() * sizeof(T));
+    cudaMemcpy(
+      d_query_set_, query_set_, query_set_size() * dim() * sizeof(T), cudaMemcpyHostToDevice);
   }
 #endif
   return d_query_set_;

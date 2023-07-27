@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <raft/util/integer_utils.hpp>
+#pragma once
 
 #include "benchmark_util.hpp"
 #include "conf.h"
@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <fstream>
 #include <limits>
 #include <memory>
 #include <numeric>
@@ -97,8 +98,13 @@ void bench_build(::benchmark::State& state,
     }
   }
 
-  const auto algo = ann::create_algo<T>(
-    index.algo, dataset->distance(), dataset->dim(), index.build_param, index.dev_list);
+  std::unique_ptr<ANN<T>> algo;
+  try {
+    algo = ann::create_algo<T>(
+      index.algo, dataset->distance(), dataset->dim(), index.build_param, index.dev_list);
+  } catch (const std::exception& e) {
+    return state.SkipWithError("Failed to create an algo: " + std::string(e.what()));
+  }
 
   const auto algo_property = algo->get_property();
 
@@ -150,9 +156,15 @@ void bench_search(::benchmark::State& state,
   // Round down the query data to a multiple of the batch size to loop over full batches of data
   const std::size_t query_set_size = (dataset->query_set_size() / n_queries) * n_queries;
 
-  const auto algo = ann::create_algo<T>(
-    index.algo, dataset->distance(), dataset->dim(), index.build_param, index.dev_list);
-  const auto search_param = ann::create_search_param<T>(index.algo, sp_json);
+  std::unique_ptr<ANN<T>> algo;
+  std::unique_ptr<typename ANN<T>::AnnSearchParam> search_param;
+  try {
+    algo = ann::create_algo<T>(
+      index.algo, dataset->distance(), dataset->dim(), index.build_param, index.dev_list);
+    search_param = ann::create_search_param<T>(index.algo, sp_json);
+  } catch (const std::exception& e) {
+    return state.SkipWithError("Failed to create an algo: " + std::string(e.what()));
+  }
   algo->set_search_param(*search_param);
 
   if (!file_exists(index.file)) {
@@ -203,7 +215,7 @@ void bench_search(::benchmark::State& state,
                          {"GPU QPS", queries_processed / gpu_timer.total_time()},
                          {"k", k},
                          {"n_queries", n_queries}});
-  dump_parameters(state, index.search_params[search_param_ix]);
+  dump_parameters(state, sp_json);
   if (state.skipped()) { return; }
 
   // evaluate recall
