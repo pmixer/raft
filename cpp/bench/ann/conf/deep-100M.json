@@ -185,11 +185,7 @@
     {
       "name" : "raft_ivf_flat.nlist100K",
       "algo" : "raft_ivf_flat",
-      "build_param": {
-        "nlist" : 100000,
-        "niter" : 25,
-        "ratio" : 5
-      },
+      "build_param": {"nlist" : 100000, "niter" : 25, "ratio": 5},
       "file" : "index/deep-100M/raft_ivf_flat/nlist100K",
       "search_params" : [
         {"max_batch":10000, "max_k":10, "nprobe":20},
@@ -205,27 +201,80 @@
     {
       "name" : "raft_cagra.dim32",
       "algo" : "raft_cagra",
-      "build_param": {
-        "index_dim" : 32
-      },
+      "build_param": {"index_dim": 32, "intermediate_graph_degree": 48},
       "file" : "index/deep-100M/raft_cagra/dim32",
-      "search_params" : [
-        {"itopk": 32},
-        {"itopk": 64},
-        {"itopk": 128}
+      "search_params": [
+        {"itopk": 32, "search_width": 1, "max_iterations": 0, "algo": "single_cta"},
+        {"itopk": 32, "search_width": 1, "max_iterations": 32, "algo": "single_cta"},
+        {"itopk": 64, "search_width": 4, "max_iterations": 16, "algo": "single_cta"},
+        {"itopk": 64, "search_width": 1, "max_iterations": 64, "algo": "single_cta"},
+        {"itopk": 96, "search_width": 2, "max_iterations": 48, "algo": "single_cta"},
+        {"itopk": 128, "search_width": 8, "max_iterations": 16, "algo": "single_cta"},
+        {"itopk": 128, "search_width": 2, "max_iterations": 64, "algo": "single_cta"},
+        {"itopk": 192, "search_width": 8, "max_iterations": 24, "algo": "single_cta"},
+        {"itopk": 192, "search_width": 2, "max_iterations": 96, "algo": "single_cta"},
+        {"itopk": 256, "search_width": 8, "max_iterations": 32, "algo": "single_cta"},
+        {"itopk": 384, "search_width": 8, "max_iterations": 48, "algo": "single_cta"},
+        {"itopk": 512, "search_width": 8, "max_iterations": 64, "algo": "single_cta"}
       ]
     },
     {
-      "name" : "raft_cagra.dim64",
-      "algo" : "raft_cagra",
-      "build_param": {
-        "index_dim" : 64
-      },
-      "file" : "index/deep-100M/raft_cagra/dim64",
+      "name": "raft_cagra.dim32.multi_cta",
+      "algo": "raft_cagra",
+      "build_param": {"index_dim": 32, "intermediate_graph_degree": 48},
+      "file": "index/deep-100M/raft_cagra/dim32",
+      "search_params": [
+        {"itopk": 32, "search_width": 1, "max_iterations": 0, "algo": "multi_cta"},
+        {"itopk": 32, "search_width": 1, "max_iterations": 32, "algo": "multi_cta"},
+        {"itopk": 64, "search_width": 4, "max_iterations": 16, "algo": "multi_cta"},
+        {"itopk": 64, "search_width": 1, "max_iterations": 64, "algo": "multi_cta"},
+        {"itopk": 96, "search_width": 2, "max_iterations": 48, "algo": "multi_cta"},
+        {"itopk": 128, "search_width": 8, "max_iterations": 16, "algo": "multi_cta"},
+        {"itopk": 128, "search_width": 2, "max_iterations": 64, "algo": "multi_cta"},
+        {"itopk": 192, "search_width": 8, "max_iterations": 24, "algo": "multi_cta"},
+        {"itopk": 192, "search_width": 2, "max_iterations": 96, "algo": "multi_cta"},
+        {"itopk": 256, "search_width": 8, "max_iterations": 32, "algo": "multi_cta"},
+        {"itopk": 384, "search_width": 8, "max_iterations": 48, "algo": "multi_cta"},
+        {"itopk": 512, "search_width": 8, "max_iterations": 64, "algo": "multi_cta"}
+      ]
+    {
+      "name": "raft_cagra.dim32.multi_kernel",
+      "algo": "raft_cagra",
+      "build_param": {"index_dim": 32, "intermediate_graph_degree": 48},
+      "file": "index/deep-100M/raft_cagra/dim32",
+      "search_params": [
+        {"itopk": 32, "search_width": 1, "max_iterations": 0, "algo": "multi_kernel"},
+        {"itopk": 32, "search_width": 1, "max_iterations": 32, "algo": "multi_kernel"},
+        {"itopk": 64, "search_width": 4, "max_iterations": 16, "algo": "multi_kernel"},
+        {"itopk": 64, "search_width": 1, "max_iterations": 64, "algo": "multi_kernel"},
+        {"itopk": 96, "search_width": 2, "max_iterations": 48, "algo": "multi_kernel"},
+        {"itopk": 128, "search_width": 8, "max_iterations": 16, "algo": "multi_kernel"},
+        {"itopk": 128, "search_width": 2, "max_iterations": 64, "algo": "multi_kernel"},
+        {"itopk": 192, "search_width": 8, "max_iterations": 24, "algo": "multi_kernel"},
+        {"itopk": 192, "search_width": 2, "max_iterations": 96, "algo": "multi_kernel"},
+        {"itopk": 256, "search_width": 8, "max_iterations": 32, "algo": "multi_kernel"},
+        {"itopk": 384, "search_width": 8, "max_iterations": 48, "algo": "multi_kernel"},
+        {"itopk": 512, "search_width": 8, "max_iterations": 64, "algo": "multi_kernel"}
+      ]
+    },
+    {
+      "name": "raft_cagra.dim64",
+      "algo": "raft_cagra",
+      "build_param": {"index_dim": 64},
+      "file": "index/deep-100M/raft_cagra/dim64",
       "search_params" : [
-        {"itopk": 32},
-        {"itopk": 64},
-        {"itopk": 128}
+        {"itopk": 32, "search_width": 1, "max_iterations": 0},
+        {"itopk": 32, "search_width": 1, "max_iterations": 32},
+        {"itopk": 64, "search_width": 4, "max_iterations": 16},
+        {"itopk": 64, "search_width": 1, "max_iterations": 64},
+        {"itopk": 96, "search_width": 2, "max_iterations": 48},
+        {"itopk": 128, "search_width": 8, "max_iterations": 16},
+        {"itopk": 128, "search_width": 2, "max_iterations": 64},
+        {"itopk": 192, "search_width": 8, "max_iterations": 24},
+        {"itopk": 192, "search_width": 2, "max_iterations": 96},
+        {"itopk": 256, "search_width": 8, "max_iterations": 32},
+        {"itopk": 384, "search_width": 8, "max_iterations": 48},
+        {"itopk": 512, "search_width": 8, "max_iterations": 64}
       ]
     }
   ]
