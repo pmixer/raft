@@ -144,23 +144,6 @@ void bench_build(::benchmark::State& state,
 }
 
 template <typename T>
-void register_build(std::shared_ptr<const Dataset<T>> dataset,
-                    std::vector<Configuration::Index> indices,
-                    bool force_overwrite)
-{
-  for (auto index : indices) {
-    auto suf      = static_cast<std::string>(index.build_param["override_suffix"]);
-    auto file_suf = suf;
-    index.build_param.erase("override_suffix");
-    std::replace(file_suf.begin(), file_suf.end(), '/', '-');
-    index.file += file_suf;
-    auto* b = ::benchmark::RegisterBenchmark(
-      index.name + suf, bench_build<T>, dataset, index, force_overwrite);
-    b->Unit(benchmark::kSecond);
-  }
-}
-
-template <typename T>
 void bench_search(::benchmark::State& state,
                   std::shared_ptr<const Dataset<T>> dataset,
                   Configuration::Index index,
@@ -263,21 +246,6 @@ void bench_search(::benchmark::State& state,
   }
 }
 
-template <typename T>
-void register_search(std::shared_ptr<const Dataset<T>> dataset,
-                     std::vector<Configuration::Index> indices)
-{
-  for (auto index : indices) {
-    for (std::size_t i = 0; i < index.search_params.size(); i++) {
-      auto suf = static_cast<std::string>(index.search_params[i]["override_suffix"]);
-      index.search_params[i].erase("override_suffix");
-      auto* b =
-        ::benchmark::RegisterBenchmark(index.name + suf, bench_search<T>, dataset, index, i);
-      b->Unit(benchmark::kMillisecond);
-    }
-  }
-}
-
 inline void printf_usage()
 {
   ::benchmark::PrintDefaultHelp();
@@ -298,6 +266,38 @@ inline void printf_usage()
           " override a build/search key one or more times multiplying the number of configurations;"
           " you can use this parameter multiple times to get the Cartesian product of benchmark"
           " configs.\n");
+}
+
+template <typename T>
+void register_build(std::shared_ptr<const Dataset<T>> dataset,
+                    std::vector<Configuration::Index> indices,
+                    bool force_overwrite)
+{
+  for (auto index : indices) {
+    auto suf      = static_cast<std::string>(index.build_param["override_suffix"]);
+    auto file_suf = suf;
+    index.build_param.erase("override_suffix");
+    std::replace(file_suf.begin(), file_suf.end(), '/', '-');
+    index.file += file_suf;
+    auto* b = ::benchmark::RegisterBenchmark(
+      index.name + suf, bench_build<T>, dataset, index, force_overwrite);
+    b->Unit(benchmark::kSecond);
+  }
+}
+
+template <typename T>
+void register_search(std::shared_ptr<const Dataset<T>> dataset,
+                     std::vector<Configuration::Index> indices)
+{
+  for (auto index : indices) {
+    for (std::size_t i = 0; i < index.search_params.size(); i++) {
+      auto suf = static_cast<std::string>(index.search_params[i]["override_suffix"]);
+      index.search_params[i].erase("override_suffix");
+      auto* b =
+        ::benchmark::RegisterBenchmark(index.name + suf, bench_search<T>, dataset, index, i);
+      b->Unit(benchmark::kMillisecond);
+    }
+  }
 }
 
 template <typename T>
