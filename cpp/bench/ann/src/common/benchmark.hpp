@@ -158,22 +158,30 @@ void bench_search(::benchmark::State& state,
   // Round down the query data to a multiple of the batch size to loop over full batches of data
   const std::size_t query_set_size = (dataset->query_set_size() / n_queries) * n_queries;
 
-  std::unique_ptr<ANN<T>> algo;
+  if (!file_exists(index.file)) {
+    state.SkipWithError("Index file is missing. Run the benchmark in the build mode first.");
+    return;
+  }
+  // algo is static to cache it between close search runs to save time on index loading
+  static std::string index_file = "";
+  static std::unique_ptr<ANN<T>> algo{nullptr};
+  if (index.file != index_file) {
+    algo.reset();
+    index_file = index.file;
+  }
+
   std::unique_ptr<typename ANN<T>::AnnSearchParam> search_param;
   try {
-    algo = ann::create_algo<T>(
-      index.algo, dataset->distance(), dataset->dim(), index.build_param, index.dev_list);
+    if (!algo) {
+      algo = ann::create_algo<T>(
+        index.algo, dataset->distance(), dataset->dim(), index.build_param, index.dev_list);
+      algo->load(index_file);
+    }
     search_param = ann::create_search_param<T>(index.algo, sp_json);
   } catch (const std::exception& e) {
     return state.SkipWithError("Failed to create an algo: " + std::string(e.what()));
   }
   algo->set_search_param(*search_param);
-
-  if (!file_exists(index.file)) {
-    state.SkipWithError("Index file is missing. Run the benchmark in the build mode first.");
-    return;
-  }
-  algo->load(index.file);
 
   const auto algo_property = algo->get_property();
   const T* query_set       = dataset->query_set(algo_property.query_memory_type);
