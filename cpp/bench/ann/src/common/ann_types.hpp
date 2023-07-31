@@ -32,6 +32,17 @@ enum class Metric {
   kEuclidean,
 };
 
+inline auto parse_metric(const std::string& metric_str) -> Metric
+{
+  if (metric_str == "inner_product") {
+    return raft::bench::ann::Metric::kInnerProduct;
+  } else if (metric_str == "euclidean") {
+    return raft::bench::ann::Metric::kEuclidean;
+  } else {
+    throw std::runtime_error("invalid metric: '" + metric_str + "'");
+  }
+}
+
 struct AlgoProperty {
   MemoryType dataset_memory_type;
   // neighbors/distances should have same memory type as queries

@@ -16,13 +16,13 @@
 
 #pragma once
 
-#include <memory>
-#include <stdexcept>
-
 #include "../common/ann_types.hpp"
-#include "../common/benchmark_util.hpp"
+
 #include <ggnn/cuda_knn_ggnn_gpu_instance.cuh>
 #include <raft/util/cudart_utils.hpp>
+
+#include <memory>
+#include <stdexcept>
 
 namespace raft::bench::ann {
 

@@ -16,6 +16,10 @@
 #ifndef FAISS_WRAPPER_H_
 #define FAISS_WRAPPER_H_
 
+#include "../common/ann_types.hpp"
+
+#include <raft/util/cudart_utils.hpp>
+
 #include <faiss/IndexFlat.h>
 #include <faiss/IndexIVFFlat.h>
 #include <faiss/IndexIVFPQ.h>
@@ -34,10 +38,6 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-
-#include "../common/ann_types.hpp"
-#include "../common/benchmark_util.hpp"
-#include <raft/util/cudart_utils.hpp>
 
 namespace {
 

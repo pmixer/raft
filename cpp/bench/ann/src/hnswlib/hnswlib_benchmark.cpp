@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "../common/ann_types.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <memory>
@@ -22,9 +24,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "../common/benchmark_util.hpp"
-
-#include "../common/ann_types.hpp"
 #undef WARP_SIZE
 #include "hnswlib_wrapper.h"
 #define JSON_DIAGNOSTICS 1

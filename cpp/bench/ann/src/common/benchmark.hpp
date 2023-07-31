@@ -15,7 +15,7 @@
  */
 #pragma once
 
-#include "benchmark_util.hpp"
+#include "ann_types.hpp"
 #include "conf.h"
 #include "dataset.h"
 #include "util.h"

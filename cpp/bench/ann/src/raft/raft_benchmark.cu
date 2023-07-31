@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "../common/ann_types.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <memory>
@@ -22,8 +24,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "../common/ann_types.hpp"
-#include "../common/benchmark_util.hpp"
 #undef WARP_SIZE
 #ifdef RAFT_ANN_BENCH_USE_RAFT_BFKNN
 #include "raft_wrapper.h"
