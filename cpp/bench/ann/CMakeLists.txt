@@ -92,6 +92,7 @@ function(ConfigureAnnBench)
             ${RAFT_CTK_MATH_DEPENDENCIES}
             $<TARGET_NAME_IF_EXISTS:OpenMP::OpenMP_CXX>
             $<TARGET_NAME_IF_EXISTS:conda_env>
+            -static-libgcc -static-libstdc++
   )
 
   set_target_properties(
@@ -220,7 +221,7 @@ target_link_libraries(benchmark_static PUBLIC ${TMP_PROP})
 target_include_directories(ANN_BENCH PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
 target_link_libraries(
-  ANN_BENCH PRIVATE nlohmann_json::nlohmann_json benchmark_static dl
+  ANN_BENCH PRIVATE nlohmann_json::nlohmann_json benchmark_static dl -static-libgcc -static-libstdc++
 )
 set_target_properties(
   ANN_BENCH
