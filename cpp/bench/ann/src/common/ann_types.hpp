@@ -49,16 +49,25 @@ struct AlgoProperty {
   MemoryType query_memory_type;
 };
 
+class AnnBase {
+ public:
+  inline AnnBase(Metric metric, int dim) : metric_(metric), dim_(dim) {}
+  virtual ~AnnBase() = default;
+
+ protected:
+  Metric metric_;
+  int dim_;
+};
+
 template <typename T>
-class ANN {
+class ANN : public AnnBase {
  public:
   struct AnnSearchParam {
     virtual ~AnnSearchParam() = default;
     [[nodiscard]] virtual auto needs_dataset() const -> bool { return false; };
   };
 
-  ANN(Metric metric, int dim) : metric_(metric), dim_(dim) {}
-  virtual ~ANN() = default;
+  inline ANN(Metric metric, int dim) : AnnBase(metric, dim) {}
 
   virtual void build(const T* dataset, size_t nrow, cudaStream_t stream = 0) = 0;
 
@@ -87,10 +96,6 @@ class ANN {
   // The client code should call set_search_dataset() before searching,
   // and should not release dataset before searching is finished.
   virtual void set_search_dataset(const T* /*dataset*/, size_t /*nrow*/){};
-
- protected:
-  Metric metric_;
-  int dim_;
 };
 
 }  // namespace raft::bench::ann

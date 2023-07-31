@@ -35,6 +35,8 @@
 
 namespace raft::bench::ann {
 
+static inline std::unique_ptr<AnnBase> current_algo{nullptr};
+
 using kv_series = std::vector<std::tuple<std::string, std::vector<nlohmann::json>>>;
 
 inline auto apply_overrides(const std::vector<nlohmann::json>& configs,
@@ -164,18 +166,19 @@ void bench_search(::benchmark::State& state,
   }
   // algo is static to cache it between close search runs to save time on index loading
   static std::string index_file = "";
-  static std::unique_ptr<ANN<T>> algo{nullptr};
   if (index.file != index_file) {
-    algo.reset();
+    current_algo.reset();
     index_file = index.file;
   }
-
+  ANN<T>* algo;
   std::unique_ptr<typename ANN<T>::AnnSearchParam> search_param;
   try {
-    if (!algo) {
-      algo = ann::create_algo<T>(
+    if (!current_algo || (algo = dynamic_cast<ANN<T>*>(current_algo.get())) == nullptr) {
+      auto ualgo = ann::create_algo<T>(
         index.algo, dataset->distance(), dataset->dim(), index.build_param, index.dev_list);
+      algo = ualgo.get();
       algo->load(index_file);
+      current_algo = std::move(ualgo);
     }
     search_param = ann::create_search_param<T>(index.algo, sp_json);
   } catch (const std::exception& e) {
@@ -479,6 +482,9 @@ inline auto run_main(int argc, char** argv) -> int
   if (::benchmark::ReportUnrecognizedArguments(argc, argv)) return -1;
   ::benchmark::RunSpecifiedBenchmarks();
   ::benchmark::Shutdown();
+  // Release a possibly cached ANN object, so that it cannot be alive longer than the handle to a
+  // shared library it depends on (dynamic benchmark executable).
+  current_algo.reset();
   return 0;
 }
 
