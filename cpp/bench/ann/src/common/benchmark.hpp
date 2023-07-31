@@ -16,9 +16,9 @@
 #pragma once
 
 #include "ann_types.hpp"
-#include "conf.h"
-#include "dataset.h"
-#include "util.h"
+#include "conf.hpp"
+#include "dataset.hpp"
+#include "util.hpp"
 
 #include <benchmark/benchmark.h>
 
@@ -336,7 +336,7 @@ void dispatch_benchmark(const Configuration& conf,
                                                  gt_file);
   ::benchmark::AddCustomContext("dataset", dataset_conf.name);
   ::benchmark::AddCustomContext("distance", dataset_conf.distance);
-  std::vector<Configuration::Index> indices = conf.get_indices("*");
+  std::vector<Configuration::Index> indices = conf.get_indices();
   if (build_mode) {
     if (file_exists(base_file)) {
       log_info("Using the dataset file '%s'", base_file.c_str());

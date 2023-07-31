@@ -19,11 +19,14 @@
 
 #include <cuda_runtime_api.h>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include <chrono>
 #include <cstdio>
 #include <cstring>
 #include <ctime>
-#include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -151,11 +154,47 @@ inline auto cuda_info()
   return props;
 }
 
-std::vector<std::string> split(const std::string& s, char delimiter);
+inline std::vector<std::string> split(const std::string& s, char delimiter)
+{
+  std::vector<std::string> tokens;
+  std::string token;
+  std::istringstream iss(s);
+  while (getline(iss, token, delimiter)) {
+    if (!token.empty()) { tokens.push_back(token); }
+  }
+  return tokens;
+}
 
-bool file_exists(const std::string& filename);
-bool dir_exists(const std::string& dir);
-bool create_dir(const std::string& dir);
+inline bool file_exists(const std::string& filename)
+{
+  struct stat statbuf;
+  if (stat(filename.c_str(), &statbuf) != 0) { return false; }
+  return S_ISREG(statbuf.st_mode);
+}
+
+inline bool dir_exists(const std::string& dir)
+{
+  struct stat statbuf;
+  if (stat(dir.c_str(), &statbuf) != 0) { return false; }
+  return S_ISDIR(statbuf.st_mode);
+}
+
+inline bool create_dir(const std::string& dir)
+{
+  const auto path = split(dir, '/');
+
+  std::string cwd;
+  if (!dir.empty() && dir[0] == '/') { cwd += '/'; }
+
+  for (const auto& p : path) {
+    cwd += p + "/";
+    if (!dir_exists(cwd)) {
+      int ret = mkdir(cwd.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+      if (ret != 0) { return false; }
+    }
+  }
+  return true;
+}
 
 inline void make_sure_parent_dir_exists(const std::string& file_path)
 {

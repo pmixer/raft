@@ -77,10 +77,7 @@ function(ConfigureAnnBench)
 
   set(BENCH_NAME ${ConfigureAnnBench_NAME}_ANN_BENCH)
 
-  add_library(
-    ${BENCH_NAME} SHARED
-    ${ConfigureAnnBench_PATH}
-  )
+  add_library(${BENCH_NAME} SHARED ${ConfigureAnnBench_PATH})
 
   string(TOLOWER ${BENCH_NAME} BENCH_LIB_NAME)
   set_target_properties(${BENCH_NAME} PROPERTIES OUTPUT_NAME ${BENCH_LIB_NAME})
@@ -205,7 +202,6 @@ if(RAFT_ANN_BENCH_USE_GGNN)
   )
 endif()
 
-
 # Build and link static version of the GBench to keep ANN_BENCH self-contained.
 get_target_property(TMP_PROP benchmark::benchmark SOURCES)
 add_library(benchmark_static STATIC ${TMP_PROP})
@@ -214,32 +210,23 @@ target_include_directories(benchmark_static PUBLIC ${TMP_PROP})
 get_target_property(TMP_PROP benchmark::benchmark LINK_LIBRARIES)
 target_link_libraries(benchmark_static PUBLIC ${TMP_PROP})
 
-add_executable(
-  ANN_BENCH
-  bench/ann/src/common/benchmark.cpp
-  bench/ann/src/common/conf.cpp
-  bench/ann/src/common/util.cpp
-)
+add_executable(ANN_BENCH bench/ann/src/common/benchmark.cpp)
 
 target_include_directories(ANN_BENCH PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
 target_link_libraries(
-  ANN_BENCH
-  PRIVATE nlohmann_json::nlohmann_json
-          benchmark_static
-          dl
-          CUDA::cudart_static
+  ANN_BENCH PRIVATE nlohmann_json::nlohmann_json benchmark_static dl CUDA::cudart_static
 )
 set_target_properties(
   ANN_BENCH
   PROPERTIES # set target compile options
-              INSTALL_RPATH "\$ORIGIN/../../../lib"
-              CXX_STANDARD 17
-              CXX_STANDARD_REQUIRED ON
-              CUDA_STANDARD 17
-              CUDA_STANDARD_REQUIRED ON
-              POSITION_INDEPENDENT_CODE ON
-              INTERFACE_POSITION_INDEPENDENT_CODE ON
+             INSTALL_RPATH "\$ORIGIN/../../../lib"
+             CXX_STANDARD 17
+             CXX_STANDARD_REQUIRED ON
+             CUDA_STANDARD 17
+             CUDA_STANDARD_REQUIRED ON
+             POSITION_INDEPENDENT_CODE ON
+             INTERFACE_POSITION_INDEPENDENT_CODE ON
 )
 
 target_link_options(ANN_BENCH PRIVATE -export-dynamic)

@@ -15,7 +15,7 @@
  */
 #pragma once
 
-#include "util.h"
+#include "util.hpp"
 
 #ifndef CPU_ONLY
 #include <cuda_fp16.h>
