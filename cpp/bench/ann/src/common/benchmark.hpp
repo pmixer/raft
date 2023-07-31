@@ -17,6 +17,7 @@
 
 #include "ann_types.hpp"
 #include "conf.hpp"
+#include "cuda_stub.hpp"
 #include "dataset.hpp"
 #include "util.hpp"
 
@@ -224,10 +225,11 @@ void bench_search(::benchmark::State& state,
     queries_processed += n_queries;
   }
   state.SetItemsProcessed(queries_processed);
-  state.counters.insert({{"GPU Time", gpu_timer.total_time() / state.iterations()},
-                         {"GPU QPS", queries_processed / gpu_timer.total_time()},
-                         {"k", k},
-                         {"n_queries", n_queries}});
+  state.counters.insert({{"k", k}, {"n_queries", n_queries}});
+  if (cudart.found()) {
+    state.counters.insert({{"GPU Time", gpu_timer.total_time() / state.iterations()},
+                           {"GPU QPS", queries_processed / gpu_timer.total_time()}});
+  }
   dump_parameters(state, sp_json);
   if (state.skipped()) { return; }
 
@@ -293,6 +295,7 @@ void register_build(std::shared_ptr<const Dataset<T>> dataset,
     auto* b = ::benchmark::RegisterBenchmark(
       index.name + suf, bench_build<T>, dataset, index, force_overwrite);
     b->Unit(benchmark::kSecond);
+    b->UseRealTime();
   }
 }
 
@@ -307,6 +310,7 @@ void register_search(std::shared_ptr<const Dataset<T>> dataset,
       auto* b =
         ::benchmark::RegisterBenchmark(index.name + suf, bench_search<T>, dataset, index, i);
       b->Unit(benchmark::kMillisecond);
+      b->UseRealTime();
     }
   }
 }
@@ -319,8 +323,10 @@ void dispatch_benchmark(const Configuration& conf,
                         std::string prefix,
                         kv_series override_kv)
 {
-  for (auto [key, value] : cuda_info()) {
-    ::benchmark::AddCustomContext(key, value);
+  if (cudart.found()) {
+    for (auto [key, value] : cuda_info()) {
+      ::benchmark::AddCustomContext(key, value);
+    }
   }
   const auto dataset_conf = conf.get_dataset_conf();
   auto base_file          = combine_path(prefix, dataset_conf.base_file);
@@ -461,6 +467,8 @@ inline auto run_main(int argc, char** argv) -> int
     log_error("Can't open configuration file: %s", conf_path);
     return -1;
   }
+
+  if (!cudart.found()) { log_warn("cudart library is not found, GPU-based indices won't work."); }
 
   Configuration conf(conf_stream);
   std::string dtype = conf.get_dataset_conf().dtype;

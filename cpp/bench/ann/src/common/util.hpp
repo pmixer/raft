@@ -17,7 +17,7 @@
 
 #include "ann_types.hpp"
 
-#include <cuda_runtime_api.h>
+#include "cuda_stub.hpp"
 
 #include <sys/stat.h>
 #include <sys/types.h>

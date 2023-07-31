@@ -55,8 +55,8 @@ class BinFile {
           uint32_t subset_size      = 0);
   ~BinFile()
   {
-    if (mapped_ptr_) { unmap(); }
-    if (fp_) { fclose(fp_); }
+    if (mapped_ptr_ != nullptr) { unmap(); }
+    if (fp_ != nullptr) { fclose(fp_); }
   }
   BinFile(const BinFile&)            = delete;
   BinFile& operator=(const BinFile&) = delete;
@@ -103,6 +103,7 @@ class BinFile {
     int fid     = fileno(fp_);
     mapped_ptr_ = mmap(nullptr, file_size_, PROT_READ, MAP_PRIVATE, fid, 0);
     if (mapped_ptr_ == MAP_FAILED) {
+      mapped_ptr_ = nullptr;
       throw std::runtime_error("mmap error: Value of errno " + std::to_string(errno) + ", " +
                                std::string(strerror(errno)));
     }
@@ -126,11 +127,11 @@ class BinFile {
   uint32_t subset_first_row_;
   uint32_t subset_size_;
 
-  mutable FILE* fp_;
+  mutable FILE* fp_{nullptr};
   mutable uint32_t nrows_;
   mutable uint32_t ndims_;
   mutable size_t file_size_;
-  mutable void* mapped_ptr_;
+  mutable void* mapped_ptr_{nullptr};
 };
 
 template <typename T>

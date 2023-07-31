@@ -202,6 +202,12 @@ if(RAFT_ANN_BENCH_USE_GGNN)
   )
 endif()
 
+
+# ##################################################################################################
+# * Dynamically-loading ANN_BENCH executable -------------------------------------------------------
+
+add_executable(ANN_BENCH bench/ann/src/common/benchmark.cpp)
+
 # Build and link static version of the GBench to keep ANN_BENCH self-contained.
 get_target_property(TMP_PROP benchmark::benchmark SOURCES)
 add_library(benchmark_static STATIC ${TMP_PROP})
@@ -210,12 +216,11 @@ target_include_directories(benchmark_static PUBLIC ${TMP_PROP})
 get_target_property(TMP_PROP benchmark::benchmark LINK_LIBRARIES)
 target_link_libraries(benchmark_static PUBLIC ${TMP_PROP})
 
-add_executable(ANN_BENCH bench/ann/src/common/benchmark.cpp)
 
 target_include_directories(ANN_BENCH PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
 target_link_libraries(
-  ANN_BENCH PRIVATE nlohmann_json::nlohmann_json benchmark_static dl CUDA::cudart_static
+  ANN_BENCH PRIVATE nlohmann_json::nlohmann_json benchmark_static dl
 )
 set_target_properties(
   ANN_BENCH
