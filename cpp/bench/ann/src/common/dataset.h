@@ -55,6 +55,7 @@ class BinFile {
           uint32_t subset_size      = 0);
   ~BinFile()
   {
+    if (mapped_ptr_) { unmap(); }
     if (fp_) { fclose(fp_); }
   }
   BinFile(const BinFile&)            = delete;
@@ -374,10 +375,6 @@ class BinDataset : public Dataset<T> {
              const std::string& query_file,
              const std::string& distance,
              const std::optional<std::string>& groundtruth_neighbors_file);
-  ~BinDataset()
-  {
-    if (this->mapped_base_set_) { base_file_.unmap(); }
-  }
 
   int dim() const override;
   uint32_t max_k() const override;

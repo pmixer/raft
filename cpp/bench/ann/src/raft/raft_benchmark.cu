@@ -250,6 +250,6 @@ std::unique_ptr<typename raft::bench::ann::ANN<T>::AnnSearchParam> create_search
 
 };  // namespace raft::bench::ann
 
-#include "../common/benchmark.hpp"
-
-int main(int argc, char** argv) { return raft::bench::ann::run_main(argc, argv); }
+REGISTER_ALGO_INSTANCE(float);
+REGISTER_ALGO_INSTANCE(std::int8_t);
+REGISTER_ALGO_INSTANCE(std::uint8_t);

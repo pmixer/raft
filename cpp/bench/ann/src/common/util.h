@@ -15,6 +15,8 @@
  */
 #pragma once
 
+#include "ann_types.hpp"
+
 #include <cuda_runtime_api.h>
 
 #include <chrono>
@@ -28,12 +30,6 @@
 #include <filesystem>
 
 namespace raft::bench::ann {
-
-enum class MemoryType {
-  Host,
-  HostMmap,
-  Device,
-};
 
 template <typename T>
 struct buf {

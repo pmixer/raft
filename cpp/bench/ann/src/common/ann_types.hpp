@@ -18,14 +18,19 @@
 
 #pragma once
 
-#include "util.h"
-
+#include <stdexcept>
 #include <string>
 #include <vector>
 
-#include <cuda_runtime_api.h>
+#include <cuda_runtime_api.h>  // cudaStream_t
 
 namespace raft::bench::ann {
+
+enum class MemoryType {
+  Host,
+  HostMmap,
+  Device,
+};
 
 enum class Metric {
   kInnerProduct,
@@ -99,3 +104,11 @@ class ANN : public AnnBase {
 };
 
 }  // namespace raft::bench::ann
+
+#define REGISTER_ALGO_INSTANCE(DataT)                                                            \
+  template auto raft::bench::ann::create_algo<DataT>(                                            \
+    const std::string&, const std::string&, int, const nlohmann::json&, const std::vector<int>&) \
+    ->std::unique_ptr<raft::bench::ann::ANN<DataT>>;                                             \
+  template auto raft::bench::ann::create_search_param<DataT>(const std::string&,                 \
+                                                             const nlohmann::json&)              \
+    ->std::unique_ptr<typename raft::bench::ann::ANN<DataT>::AnnSearchParam>;
