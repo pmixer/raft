@@ -262,23 +262,28 @@ void bench_search(::benchmark::State& state,
 inline void printf_usage()
 {
   ::benchmark::PrintDefaultHelp();
-  fprintf(stdout,
-          "          [--build|--search] \n"
-          "          [--overwrite]\n"
-          "          [--data_prefix=<prefix>]\n"
-          "          <conf>.json\n"
-          "\n"
-          "Note the non-standard benchmark parameters:\n"
-          "  --build: build mode, will build index\n"
-          "  --search: search mode, will search using the built index\n"
-          "            one and only one of --build and --search should be specified\n"
-          "  --overwrite: force overwriting existing index files\n"
-          "  --data_prefix=<prefix>:"
-          " prepend <prefix> to dataset file paths specified in the <conf>.json.\n"
-          "  --override_kv=<key:value1:value2:...:valueN>:"
-          " override a build/search key one or more times multiplying the number of configurations;"
-          " you can use this parameter multiple times to get the Cartesian product of benchmark"
-          " configs.\n");
+  fprintf(
+    stdout,
+    "          [--build|--search] \n"
+    "          [--overwrite]\n"
+    "          [--data_prefix=<prefix>]\n"
+    "          [--index_prefix=<prefix>]\n"
+    "          [--override_kv=<key:value1:value2:...:valueN>]\n"
+    "          <conf>.json\n"
+    "\n"
+    "Note the non-standard benchmark parameters:\n"
+    "  --build: build mode, will build index\n"
+    "  --search: search mode, will search using the built index\n"
+    "            one and only one of --build and --search should be specified\n"
+    "  --overwrite: force overwriting existing index files\n"
+    "  --data_prefix=<prefix>:"
+    " prepend <prefix> to dataset file paths specified in the <conf>.json (default = 'data/').\n"
+    "  --index_prefix=<prefix>:"
+    " prepend <prefix> to index file paths specified in the <conf>.json (default = 'index/').\n"
+    "  --override_kv=<key:value1:value2:...:valueN>:"
+    " override a build/search key one or more times multiplying the number of configurations;"
+    " you can use this parameter multiple times to get the Cartesian product of benchmark"
+    " configs.\n");
 }
 
 template <typename T>
@@ -320,7 +325,8 @@ void dispatch_benchmark(const Configuration& conf,
                         bool force_overwrite,
                         bool build_mode,
                         bool search_mode,
-                        std::string prefix,
+                        std::string data_prefix,
+                        std::string index_prefix,
                         kv_series override_kv)
 {
   if (cudart.found()) {
@@ -329,10 +335,10 @@ void dispatch_benchmark(const Configuration& conf,
     }
   }
   const auto dataset_conf = conf.get_dataset_conf();
-  auto base_file          = combine_path(prefix, dataset_conf.base_file);
-  auto query_file         = combine_path(prefix, dataset_conf.query_file);
+  auto base_file          = combine_path(data_prefix, dataset_conf.base_file);
+  auto query_file         = combine_path(data_prefix, dataset_conf.query_file);
   auto gt_file            = dataset_conf.groundtruth_neighbors_file;
-  if (gt_file.has_value()) { gt_file.emplace(combine_path(prefix, gt_file.value())); }
+  if (gt_file.has_value()) { gt_file.emplace(combine_path(data_prefix, gt_file.value())); }
   auto dataset = std::make_shared<BinDataset<T>>(dataset_conf.name,
                                                  base_file,
                                                  dataset_conf.subset_first_row,
@@ -357,6 +363,7 @@ void dispatch_benchmark(const Configuration& conf,
       for (auto param : apply_overrides(index.build_param, override_kv)) {
         auto modified_index        = index;
         modified_index.build_param = param;
+        modified_index.file        = combine_path(index_prefix, modified_index.file);
         more_indices.push_back(modified_index);
       }
     }
@@ -386,6 +393,7 @@ void dispatch_benchmark(const Configuration& conf,
     }
     for (auto& index : indices) {
       index.search_params = apply_overrides(index.search_params, override_kv);
+      index.file          = combine_path(index_prefix, index.file);
     }
     register_search<T>(dataset, indices);
   }
@@ -415,7 +423,8 @@ inline auto run_main(int argc, char** argv) -> int
   bool force_overwrite        = false;
   bool build_mode             = false;
   bool search_mode            = false;
-  std::string prefix          = "data";
+  std::string data_prefix     = "data";
+  std::string index_prefix    = "index";
   std::string new_override_kv = "";
   kv_series override_kv{};
 
@@ -437,7 +446,8 @@ inline auto run_main(int argc, char** argv) -> int
     if (parse_bool_flag(argv[i], "--overwrite", force_overwrite) ||
         parse_bool_flag(argv[i], "--build", build_mode) ||
         parse_bool_flag(argv[i], "--search", search_mode) ||
-        parse_string_flag(argv[i], "--data_prefix", prefix) ||
+        parse_string_flag(argv[i], "--data_prefix", data_prefix) ||
+        parse_string_flag(argv[i], "--index_prefix", index_prefix) ||
         parse_string_flag(argv[i], "--override_kv", new_override_kv)) {
       if (!new_override_kv.empty()) {
         auto kvv = split(new_override_kv, ':');
@@ -474,13 +484,14 @@ inline auto run_main(int argc, char** argv) -> int
   std::string dtype = conf.get_dataset_conf().dtype;
 
   if (dtype == "float") {
-    dispatch_benchmark<float>(conf, force_overwrite, build_mode, search_mode, prefix, override_kv);
+    dispatch_benchmark<float>(
+      conf, force_overwrite, build_mode, search_mode, data_prefix, index_prefix, override_kv);
   } else if (dtype == "uint8") {
     dispatch_benchmark<std::uint8_t>(
-      conf, force_overwrite, build_mode, search_mode, prefix, override_kv);
+      conf, force_overwrite, build_mode, search_mode, data_prefix, index_prefix, override_kv);
   } else if (dtype == "int8") {
     dispatch_benchmark<std::int8_t>(
-      conf, force_overwrite, build_mode, search_mode, prefix, override_kv);
+      conf, force_overwrite, build_mode, search_mode, data_prefix, index_prefix, override_kv);
   } else {
     log_error("datatype '%s' is not supported", dtype.c_str());
     return -1;

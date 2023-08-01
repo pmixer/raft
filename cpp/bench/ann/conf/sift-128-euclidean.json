@@ -14,11 +14,11 @@
 
   "index": [
     {
-      "name" : "hnswlib.M12",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M12",
+      "algo": "hnswlib",
       "build_param": {"M":12, "efConstruction":500, "numThreads":32},
-      "file" : "index/sift-128-euclidean/hnswlib/M12",
-      "search_params" : [
+      "file": "sift-128-euclidean/hnswlib/M12",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -32,11 +32,11 @@
       ]
     },
     {
-      "name" : "hnswlib.M16",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M16",
+      "algo": "hnswlib",
       "build_param": {"M":16, "efConstruction":500, "numThreads":32},
-      "file" : "index/sift-128-euclidean/hnswlib/M16",
-      "search_params" : [
+      "file": "sift-128-euclidean/hnswlib/M16",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -50,11 +50,11 @@
       ]
     },
     {
-      "name" : "hnswlib.M24",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M24",
+      "algo": "hnswlib",
       "build_param": {"M":24, "efConstruction":500, "numThreads":32},
-      "file" : "index/sift-128-euclidean/hnswlib/M24",
-      "search_params" : [
+      "file": "sift-128-euclidean/hnswlib/M24",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -68,11 +68,11 @@
       ]
     },
     {
-      "name" : "hnswlib.M36",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M36",
+      "algo": "hnswlib",
       "build_param": {"M":36, "efConstruction":500, "numThreads":32},
-      "file" : "index/sift-128-euclidean/hnswlib/M36",
-      "search_params" : [
+      "file": "sift-128-euclidean/hnswlib/M36",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -89,14 +89,14 @@
       "name": "raft_bfknn",
       "algo": "raft_bfknn",
       "build_param": {},
-      "file": "index/sift-128-euclidean/raft_bfknn/bfknn",
+      "file": "sift-128-euclidean/raft_bfknn/bfknn",
       "search_params": [{"probe": 1}]
     },
     {
       "name": "faiss_ivf_flat.nlist1024",
       "algo": "faiss_gpu_ivf_flat",
       "build_param": {"nlist": 1024},
-      "file": "index/sift-128-euclidean/faiss_ivf_flat/nlist1024",
+      "file": "sift-128-euclidean/faiss_ivf_flat/nlist1024",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -112,7 +112,7 @@
       "name": "faiss_ivf_flat.nlist2048",
       "algo": "faiss_gpu_ivf_flat",
       "build_param": {"nlist": 2048},
-      "file": "index/sift-128-euclidean/faiss_ivf_flat/nlist2048",
+      "file": "sift-128-euclidean/faiss_ivf_flat/nlist2048",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -128,7 +128,7 @@
       "name": "faiss_ivf_flat.nlist4096",
       "algo": "faiss_gpu_ivf_flat",
       "build_param": {"nlist": 4096},
-      "file": "index/sift-128-euclidean/faiss_ivf_flat/nlist4096",
+      "file": "sift-128-euclidean/faiss_ivf_flat/nlist4096",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -144,7 +144,7 @@
       "name": "faiss_ivf_flat.nlist8192",
       "algo": "faiss_gpu_ivf_flat",
       "build_param": {"nlist": 8192},
-      "file": "index/sift-128-euclidean/faiss_ivf_flat/nlist8192",
+      "file": "sift-128-euclidean/faiss_ivf_flat/nlist8192",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -160,7 +160,7 @@
       "name": "faiss_ivf_flat.nlist16384",
       "algo": "faiss_gpu_ivf_flat",
       "build_param": {"nlist": 16384},
-      "file": "index/sift-128-euclidean/faiss_ivf_flat/nlist16384",
+      "file": "sift-128-euclidean/faiss_ivf_flat/nlist16384",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -177,7 +177,7 @@
       "name": "faiss_ivf_pq.M64-nlist1024",
       "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist": 1024, "M": 64, "useFloat16": true, "usePrecomputed": true},
-      "file": "index/sift-128-euclidean/faiss_ivf_pq/M64-nlist1024",
+      "file": "sift-128-euclidean/faiss_ivf_pq/M64-nlist1024",
       "search_params": [
         {"nprobe": 10},
         {"nprobe": 50},
@@ -196,7 +196,7 @@
         "useFloat16": true,
         "usePrecomputed": false
       },
-      "file": "index/sift-128-euclidean/faiss_ivf_pq/M64-nlist1024.noprecomp",
+      "file": "sift-128-euclidean/faiss_ivf_pq/M64-nlist1024.noprecomp",
       "search_params": [
         {"nprobe": 10},
         {"nprobe": 50},
@@ -210,7 +210,7 @@
       "name": "faiss_ivf_sq.nlist1024-fp16",
       "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist": 1024, "quantizer_type": "fp16"},
-      "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist1024-fp16",
+      "file": "sift-128-euclidean/faiss_ivf_sq/nlist1024-fp16",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -226,7 +226,7 @@
       "name": "faiss_ivf_sq.nlist2048-fp16",
       "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist": 2048, "quantizer_type": "fp16"},
-      "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist2048-fp16",
+      "file": "sift-128-euclidean/faiss_ivf_sq/nlist2048-fp16",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -242,7 +242,7 @@
       "name": "faiss_ivf_sq.nlist4096-fp16",
       "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist": 4096, "quantizer_type": "fp16"},
-      "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist4096-fp16",
+      "file": "sift-128-euclidean/faiss_ivf_sq/nlist4096-fp16",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -258,7 +258,7 @@
       "name": "faiss_ivf_sq.nlist8192-fp16",
       "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist": 8192, "quantizer_type": "fp16"},
-      "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist8192-fp16",
+      "file": "sift-128-euclidean/faiss_ivf_sq/nlist8192-fp16",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -274,7 +274,7 @@
       "name": "faiss_ivf_sq.nlist16384-fp16",
       "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist": 16384, "quantizer_type": "fp16"},
-      "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist16384-fp16",
+      "file": "sift-128-euclidean/faiss_ivf_sq/nlist16384-fp16",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -291,7 +291,7 @@
       "name": "faiss_ivf_sq.nlist1024-int8",
       "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist": 1024, "quantizer_type": "int8"},
-      "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist1024-int8",
+      "file": "sift-128-euclidean/faiss_ivf_sq/nlist1024-int8",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -307,7 +307,7 @@
       "name": "faiss_ivf_sq.nlist2048-int8",
       "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist": 2048,"quantizer_type": "int8"},
-      "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist2048-int8",
+      "file": "sift-128-euclidean/faiss_ivf_sq/nlist2048-int8",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -323,7 +323,7 @@
       "name": "faiss_ivf_sq.nlist4096-int8",
       "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist": 4096, "quantizer_type": "int8"},
-      "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist4096-int8",
+      "file": "sift-128-euclidean/faiss_ivf_sq/nlist4096-int8",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -339,7 +339,7 @@
       "name": "faiss_ivf_sq.nlist8192-int8",
       "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist": 8192, "quantizer_type": "int8"},
-      "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist8192-int8",
+      "file": "sift-128-euclidean/faiss_ivf_sq/nlist8192-int8",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -355,7 +355,7 @@
       "name": "faiss_ivf_sq.nlist16384-int8",
       "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist": 16384, "quantizer_type": "int8"},
-      "file": "index/sift-128-euclidean/faiss_ivf_sq/nlist16384-int8",
+      "file": "sift-128-euclidean/faiss_ivf_sq/nlist16384-int8",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -372,14 +372,14 @@
       "name": "faiss_flat",
       "algo": "faiss_gpu_flat",
       "build_param": {},
-      "file": "index/sift-128-euclidean/faiss_flat/flat",
+      "file": "sift-128-euclidean/faiss_flat/flat",
       "search_params": [{}]
     },
     {
       "name": "raft_ivf_pq.dimpq64-bitpq8-cluster1K",
       "algo": "raft_ivf_pq",
       "build_param": {"niter": 25, "nlist": 1000, "pq_dim": 64, "pq_bits": 8, "ratio": 1},
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq64-bitpq8-cluster1K",
+      "file": "sift-128-euclidean/raft_ivf_pq/dimpq64-bitpq8-cluster1K",
       "search_params": [
         { "numProbes": 20, "internalDistanceDtype": "float", "smemLutDtype": "float" },
         { "numProbes": 30, "internalDistanceDtype": "float", "smemLutDtype": "float" },
@@ -411,7 +411,7 @@
       "name": "raft_ivf_pq.dimpq128-bitpq6-cluster1K",
       "algo": "raft_ivf_pq",
       "build_param": {"niter": 25, "nlist": 1000, "pq_dim": 128, "pq_bits": 6, "ratio": 1},
-      "file": "index/sift-128-euclidean/raft_ivf_pq/dimpq128-bitpq6-cluster1K",
+      "file": "sift-128-euclidean/raft_ivf_pq/dimpq128-bitpq6-cluster1K",
       "search_params": [
         { "numProbes": 20, "internalDistanceDtype": "float", "smemLutDtype": "float" },
         { "numProbes": 30, "internalDistanceDtype": "float", "smemLutDtype": "float" },
@@ -443,7 +443,7 @@
       "name": "raft_ivf_flat.nlist1024",
       "algo": "raft_ivf_flat",
       "build_param": {"nlist": 1024, "ratio": 1, "niter": 25},
-      "file": "index/sift-128-euclidean/raft_ivf_flat/nlist1024",
+      "file": "sift-128-euclidean/raft_ivf_flat/nlist1024",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -459,7 +459,7 @@
       "name": "raft_ivf_flat.nlist16384",
       "algo": "raft_ivf_flat",
       "build_param": {"nlist": 16384, "ratio": 2, "niter": 20},
-      "file": "index/sift-128-euclidean/raft_ivf_flat/nlist16384",
+      "file": "sift-128-euclidean/raft_ivf_flat/nlist16384",
       "search_params": [
         {"nprobe": 1},
         {"nprobe": 5},
@@ -473,22 +473,22 @@
       ]
     },
     {
-      "name" : "raft_cagra.dim32",
-      "algo" : "raft_cagra",
-      "build_param": {"index_dim" : 32},
-      "file" : "index/sift-128-euclidean/raft_cagra/dim32",
-      "search_params" : [
+      "name": "raft_cagra.dim32",
+      "algo": "raft_cagra",
+      "build_param": {"index_dim": 32},
+      "file": "sift-128-euclidean/raft_cagra/dim32",
+      "search_params": [
         {"itopk": 32},
         {"itopk": 64},
         {"itopk": 128}
       ]
     },
     {
-      "name" : "raft_cagra.dim64",
-      "algo" : "raft_cagra",
-      "build_param": {"index_dim" : 64},
-      "file" : "index/sift-128-euclidean/raft_cagra/dim64",
-      "search_params" : [
+      "name": "raft_cagra.dim64",
+      "algo": "raft_cagra",
+      "build_param": {"index_dim": 64},
+      "file": "sift-128-euclidean/raft_cagra/dim64",
+      "search_params": [
         {"itopk": 32},
         {"itopk": 64},
         {"itopk": 128}

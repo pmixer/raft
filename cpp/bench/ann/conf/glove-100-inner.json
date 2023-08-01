@@ -1,24 +1,24 @@
 {
-  "dataset" : {
-    "name" : "glove-100-inner",
-    "base_file" : "glove-100-inner/base.fbin",
-    "query_file" : "glove-100-inner/query.fbin",
-    "groundtruth_neighbors_file" : "glove-100-inner/groundtruth.neighbors.ibin",
-    "distance" : "inner_product"
+  "dataset": {
+    "name": "glove-100-inner",
+    "base_file": "glove-100-inner/base.fbin",
+    "query_file": "glove-100-inner/query.fbin",
+    "groundtruth_neighbors_file": "glove-100-inner/groundtruth.neighbors.ibin",
+    "distance": "inner_product"
   },
 
-  "search_basic_param" : {
-    "batch_size" : 1,
-    "k" : 10
+  "search_basic_param": {
+    "batch_size": 1,
+    "k": 10
   },
 
-  "index" : [
+  "index": [
     {
-      "name" : "hnswlib.M4",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M4",
+      "algo": "hnswlib",
       "build_param": {"M":4, "efConstruction":500, "numThreads":4},
-      "file" : "index/glove-100-inner/hnswlib/M4",
-      "search_params" : [
+      "file": "glove-100-inner/hnswlib/M4",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -31,11 +31,11 @@
       ]
     },
     {
-      "name" : "hnswlib.M8",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M8",
+      "algo": "hnswlib",
       "build_param": {"M":8, "efConstruction":500, "numThreads":4},
-      "file" : "index/glove-100-inner/hnswlib/M8",
-      "search_params" : [
+      "file": "glove-100-inner/hnswlib/M8",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -48,11 +48,11 @@
       ]
     },
     {
-      "name" : "hnswlib.M12",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M12",
+      "algo": "hnswlib",
       "build_param": {"M":12, "efConstruction":500, "numThreads":4},
-      "file" : "index/glove-100-inner/hnswlib/M12",
-      "search_params" : [
+      "file": "glove-100-inner/hnswlib/M12",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -65,11 +65,11 @@
       ]
     },
     {
-      "name" : "hnswlib.M16",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M16",
+      "algo": "hnswlib",
       "build_param": {"M":16, "efConstruction":500, "numThreads":4},
-      "file" : "index/glove-100-inner/hnswlib/M16",
-      "search_params" : [
+      "file": "glove-100-inner/hnswlib/M16",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -82,11 +82,11 @@
       ]
     },
     {
-      "name" : "hnswlib.M24",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M24",
+      "algo": "hnswlib",
       "build_param": {"M":24, "efConstruction":500, "numThreads":4},
-      "file" : "index/glove-100-inner/hnswlib/M24",
-      "search_params" : [
+      "file": "glove-100-inner/hnswlib/M24",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -99,11 +99,11 @@
       ]
     },
     {
-      "name" : "hnswlib.M36",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M36",
+      "algo": "hnswlib",
       "build_param": {"M":36, "efConstruction":500, "numThreads":4},
-      "file" : "index/glove-100-inner/hnswlib/M36",
-      "search_params" : [
+      "file": "glove-100-inner/hnswlib/M36",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -116,11 +116,11 @@
       ]
     },
     {
-      "name" : "hnswlib.M48",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M48",
+      "algo": "hnswlib",
       "build_param": {"M":48, "efConstruction":500, "numThreads":4},
-      "file" : "index/glove-100-inner/hnswlib/M48",
-      "search_params" : [
+      "file": "glove-100-inner/hnswlib/M48",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -133,11 +133,11 @@
       ]
     },
     {
-      "name" : "hnswlib.M64",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M64",
+      "algo": "hnswlib",
       "build_param": {"M":64, "efConstruction":500, "numThreads":4},
-      "file" : "index/glove-100-inner/hnswlib/M64",
-      "search_params" : [
+      "file": "glove-100-inner/hnswlib/M64",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -150,11 +150,11 @@
       ]
     },
     {
-      "name" : "hnswlib.M96",
-      "algo" : "hnswlib",
+      "name": "hnswlib.M96",
+      "algo": "hnswlib",
       "build_param": {"M":96, "efConstruction":500, "numThreads":4},
-      "file" : "index/glove-100-inner/hnswlib/M96",
-      "search_params" : [
+      "file": "glove-100-inner/hnswlib/M96",
+      "search_params": [
         {"ef":10, "numThreads":1},
         {"ef":20, "numThreads":1},
         {"ef":40, "numThreads":1},
@@ -167,11 +167,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_flat.nlist1024",
-      "algo" : "faiss_gpu_ivf_flat",
+      "name": "faiss_ivf_flat.nlist1024",
+      "algo": "faiss_gpu_ivf_flat",
       "build_param": {"nlist":1024},
-      "file" : "index/glove-100-inner/faiss_ivf_flat/nlist1024",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_flat/nlist1024",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -183,11 +183,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_flat.nlist2048",
-      "algo" : "faiss_gpu_ivf_flat",
+      "name": "faiss_ivf_flat.nlist2048",
+      "algo": "faiss_gpu_ivf_flat",
       "build_param": {"nlist":2048},
-      "file" : "index/glove-100-inner/faiss_ivf_flat/nlist2048",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_flat/nlist2048",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -199,11 +199,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_flat.nlist4096",
-      "algo" : "faiss_gpu_ivf_flat",
+      "name": "faiss_ivf_flat.nlist4096",
+      "algo": "faiss_gpu_ivf_flat",
       "build_param": {"nlist":4096},
-      "file" : "index/glove-100-inner/faiss_ivf_flat/nlist4096",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_flat/nlist4096",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -215,11 +215,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_flat.nlist8192",
-      "algo" : "faiss_gpu_ivf_flat",
+      "name": "faiss_ivf_flat.nlist8192",
+      "algo": "faiss_gpu_ivf_flat",
       "build_param": {"nlist":8192},
-      "file" : "index/glove-100-inner/faiss_ivf_flat/nlist8192",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_flat/nlist8192",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -231,11 +231,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_flat.nlist16384",
-      "algo" : "faiss_gpu_ivf_flat",
+      "name": "faiss_ivf_flat.nlist16384",
+      "algo": "faiss_gpu_ivf_flat",
       "build_param": {"nlist":16384},
-      "file" : "index/glove-100-inner/faiss_ivf_flat/nlist16384",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_flat/nlist16384",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -251,11 +251,11 @@
 
 
     {
-      "name" : "faiss_ivf_pq.M2-nlist1024",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M2-nlist1024",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":1024, "M":2},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M2-nlist1024",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M2-nlist1024",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -267,11 +267,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M2-nlist2048",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M2-nlist2048",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":2048, "M":2},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M2-nlist2048",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M2-nlist2048",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -283,11 +283,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M2-nlist4096",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M2-nlist4096",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":4096, "M":2},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M2-nlist4096",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M2-nlist4096",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -299,11 +299,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M2-nlist8192",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M2-nlist8192",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":8192, "M":2},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M2-nlist8192",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M2-nlist8192",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -315,11 +315,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M2-nlist16384",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M2-nlist16384",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":16384, "M":2},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M2-nlist16384",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M2-nlist16384",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -332,11 +332,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M4-nlist1024",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M4-nlist1024",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":1024, "M":4},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M4-nlist1024",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M4-nlist1024",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -348,11 +348,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M4-nlist2048",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M4-nlist2048",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":2048, "M":4},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M4-nlist2048",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M4-nlist2048",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -364,11 +364,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M4-nlist4096",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M4-nlist4096",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":4096, "M":4},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M4-nlist4096",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M4-nlist4096",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -380,11 +380,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M4-nlist8192",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M4-nlist8192",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":8192, "M":4},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M4-nlist8192",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M4-nlist8192",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -396,11 +396,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M4-nlist16384",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M4-nlist16384",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":16384, "M":4},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M4-nlist16384",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M4-nlist16384",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -413,11 +413,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M20-nlist1024",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M20-nlist1024",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":1024, "M":20},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M20-nlist1024",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M20-nlist1024",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -429,11 +429,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M20-nlist2048",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M20-nlist2048",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":2048, "M":20},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M20-nlist2048",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M20-nlist2048",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -445,11 +445,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M20-nlist4096",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M20-nlist4096",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":4096, "M":20},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M20-nlist4096",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M20-nlist4096",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -461,11 +461,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M20-nlist8192",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M20-nlist8192",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":8192, "M":20},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M20-nlist8192",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M20-nlist8192",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -477,11 +477,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_pq.M20-nlist16384",
-      "algo" : "faiss_gpu_ivf_pq",
+      "name": "faiss_ivf_pq.M20-nlist16384",
+      "algo": "faiss_gpu_ivf_pq",
       "build_param": {"nlist":16384, "M":20},
-      "file" : "index/glove-100-inner/faiss_ivf_pq/M20-nlist16384",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_pq/M20-nlist16384",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -496,11 +496,11 @@
 
 
     {
-      "name" : "faiss_ivf_sq.nlist1024-fp16",
-      "algo" : "faiss_gpu_ivf_sq",
+      "name": "faiss_ivf_sq.nlist1024-fp16",
+      "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist":1024, "quantizer_type":"fp16"},
-      "file" : "index/glove-100-inner/faiss_ivf_sq/nlist1024-fp16",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_sq/nlist1024-fp16",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -512,11 +512,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_sq.nlist2048-fp16",
-      "algo" : "faiss_gpu_ivf_sq",
+      "name": "faiss_ivf_sq.nlist2048-fp16",
+      "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist":2048, "quantizer_type":"fp16"},
-      "file" : "index/glove-100-inner/faiss_ivf_sq/nlist2048-fp16",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_sq/nlist2048-fp16",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -528,11 +528,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_sq.nlist4096-fp16",
-      "algo" : "faiss_gpu_ivf_sq",
+      "name": "faiss_ivf_sq.nlist4096-fp16",
+      "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist":4096, "quantizer_type":"fp16"},
-      "file" : "index/glove-100-inner/faiss_ivf_sq/nlist4096-fp16",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_sq/nlist4096-fp16",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -544,11 +544,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_sq.nlist8192-fp16",
-      "algo" : "faiss_gpu_ivf_sq",
+      "name": "faiss_ivf_sq.nlist8192-fp16",
+      "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist":8192, "quantizer_type":"fp16"},
-      "file" : "index/glove-100-inner/faiss_ivf_sq/nlist8192-fp16",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_sq/nlist8192-fp16",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -560,11 +560,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_sq.nlist16384-fp16",
-      "algo" : "faiss_gpu_ivf_sq",
+      "name": "faiss_ivf_sq.nlist16384-fp16",
+      "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist":16384, "quantizer_type":"fp16"},
-      "file" : "index/glove-100-inner/faiss_ivf_sq/nlist16384-fp16",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_sq/nlist16384-fp16",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -577,11 +577,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_sq.nlist1024-int8",
-      "algo" : "faiss_gpu_ivf_sq",
+      "name": "faiss_ivf_sq.nlist1024-int8",
+      "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist":1024, "quantizer_type":"int8"},
-      "file" : "index/glove-100-inner/faiss_ivf_sq/nlist1024-int8",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_sq/nlist1024-int8",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -593,11 +593,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_sq.nlist2048-int8",
-      "algo" : "faiss_gpu_ivf_sq",
+      "name": "faiss_ivf_sq.nlist2048-int8",
+      "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist":2048, "quantizer_type":"int8"},
-      "file" : "index/glove-100-inner/faiss_ivf_sq/nlist2048-int8",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_sq/nlist2048-int8",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -609,11 +609,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_sq.nlist4096-int8",
-      "algo" : "faiss_gpu_ivf_sq",
+      "name": "faiss_ivf_sq.nlist4096-int8",
+      "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist":4096, "quantizer_type":"int8"},
-      "file" : "index/glove-100-inner/faiss_ivf_sq/nlist4096-int8",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_sq/nlist4096-int8",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -625,11 +625,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_sq.nlist8192-int8",
-      "algo" : "faiss_gpu_ivf_sq",
+      "name": "faiss_ivf_sq.nlist8192-int8",
+      "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist":8192, "quantizer_type":"int8"},
-      "file" : "index/glove-100-inner/faiss_ivf_sq/nlist8192-int8",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_sq/nlist8192-int8",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -641,11 +641,11 @@
       ]
     },
     {
-      "name" : "faiss_ivf_sq.nlist16384-int8",
-      "algo" : "faiss_gpu_ivf_sq",
+      "name": "faiss_ivf_sq.nlist16384-int8",
+      "algo": "faiss_gpu_ivf_sq",
       "build_param": {"nlist":16384, "quantizer_type":"int8"},
-      "file" : "index/glove-100-inner/faiss_ivf_sq/nlist16384-int8",
-      "search_params" : [
+      "file": "glove-100-inner/faiss_ivf_sq/nlist16384-int8",
+      "search_params": [
         {"nprobe":1},
         {"nprobe":5},
         {"nprobe":10},
@@ -658,15 +658,15 @@
       ]
     },
     {
-      "name" : "faiss_flat",
-      "algo" : "faiss_gpu_flat",
+      "name": "faiss_flat",
+      "algo": "faiss_gpu_flat",
       "build_param": {},
-      "file" : "index/glove-100-inner/faiss_flat/flat",
-      "search_params" : [{}]
+      "file": "glove-100-inner/faiss_flat/flat",
+      "search_params": [{}]
     },
     {
-      "name" : "ggnn.kbuild96-segment64-refine2-k10",
-      "algo" : "ggnn",
+      "name": "ggnn.kbuild96-segment64-refine2-k10",
+      "algo": "ggnn",
       "build_param": {
         "k_build": 96,
         "segment_size": 64,
@@ -674,8 +674,8 @@
         "dataset_size": 1183514,
         "k": 10
       },
-      "file" : "index/glove-100-inner/ggnn/kbuild96-segment64-refine2-k10",
-      "search_params" : [
+      "file": "glove-100-inner/ggnn/kbuild96-segment64-refine2-k10",
+      "search_params": [
         {"tau":0.001, "block_dim":64, "sorted_size":32},
         {"tau":0.005, "block_dim":64, "sorted_size":32},
         {"tau":0.01,  "block_dim":64, "sorted_size":32},
