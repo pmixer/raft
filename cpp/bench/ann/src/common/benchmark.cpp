@@ -30,11 +30,7 @@ struct lib_handle {
   void* handle{nullptr};
   explicit lib_handle(const std::string& name)
   {
-    handle = dlopen(name.c_str(), RTLD_LAZY);
-    if (handle == nullptr) {
-      auto full_path = (std::filesystem::canonical("/proc/self/exe").parent_path() / name).string();
-      handle         = dlopen(full_path.c_str(), RTLD_LAZY);
-    }
+    handle = dlopen(name.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND | RTLD_NODELETE);
     if (handle == nullptr) {
       auto error_msg = "Failed to load " + name;
       auto err       = dlerror();

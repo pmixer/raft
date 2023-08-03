@@ -91,13 +91,14 @@ class RaftCagra : public ANN<T> {
   void load(const std::string&) override;
 
  private:
+  // `mr_` must go first to make sure it dies last
+  rmm::mr::pool_memory_resource<rmm::mr::device_memory_resource> mr_;
   raft::device_resources handle_;
   BuildParam index_params_;
   raft::neighbors::cagra::search_params search_params_;
   std::optional<raft::neighbors::cagra::index<T, IdxT>> index_;
   int device_;
   int dimension_;
-  rmm::mr::pool_memory_resource<rmm::mr::device_memory_resource> mr_;
 };
 
 template <typename T, typename IdxT>

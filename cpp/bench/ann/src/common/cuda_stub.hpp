@@ -24,7 +24,7 @@ struct cuda_lib_handle {
   void* handle{nullptr};
   explicit cuda_lib_handle()
   {
-    handle = dlopen("libcudart.so", RTLD_NOW | RTLD_GLOBAL | RTLD_DEEPBIND);
+    handle = dlopen("libcudart.so", RTLD_NOW | RTLD_GLOBAL | RTLD_DEEPBIND | RTLD_NODELETE);
   }
   ~cuda_lib_handle() noexcept
   {

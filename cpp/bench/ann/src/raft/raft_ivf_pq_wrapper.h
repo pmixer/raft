@@ -92,6 +92,8 @@ class RaftIvfPQ : public ANN<T> {
   void load(const std::string&) override;
 
  private:
+  // `mr_` must go first to make sure it dies last
+  rmm::mr::pool_memory_resource<rmm::mr::device_memory_resource> mr_;
   raft::device_resources handle_;
   BuildParam index_params_;
   raft::neighbors::ivf_pq::search_params search_params_;
@@ -99,7 +101,6 @@ class RaftIvfPQ : public ANN<T> {
   int device_;
   int dimension_;
   float refine_ratio_ = 1.0;
-  rmm::mr::pool_memory_resource<rmm::mr::device_memory_resource> mr_;
   raft::device_matrix_view<const T, IdxT> dataset_;
 };
 

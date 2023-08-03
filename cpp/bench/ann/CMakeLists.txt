@@ -92,19 +92,21 @@ function(ConfigureAnnBench)
             ${RAFT_CTK_MATH_DEPENDENCIES}
             $<TARGET_NAME_IF_EXISTS:OpenMP::OpenMP_CXX>
             $<TARGET_NAME_IF_EXISTS:conda_env>
-            -static-libgcc -static-libstdc++
+            -static-libgcc
+            -static-libstdc++
   )
 
   set_target_properties(
     ${BENCH_NAME}
     PROPERTIES # set target compile options
-               INSTALL_RPATH "\$ORIGIN/../../../lib"
                CXX_STANDARD 17
                CXX_STANDARD_REQUIRED ON
                CUDA_STANDARD 17
                CUDA_STANDARD_REQUIRED ON
                POSITION_INDEPENDENT_CODE ON
                INTERFACE_POSITION_INDEPENDENT_CODE ON
+               BUILD_RPATH "\$ORIGIN"
+               INSTALL_RPATH "\$ORIGIN"
   )
 
   set(${ConfigureAnnBench_CXXFLAGS} ${RAFT_CXX_FLAGS} ${ConfigureAnnBench_CXXFLAGS})
@@ -203,7 +205,6 @@ if(RAFT_ANN_BENCH_USE_GGNN)
   )
 endif()
 
-
 # ##################################################################################################
 # * Dynamically-loading ANN_BENCH executable -------------------------------------------------------
 
@@ -217,22 +218,23 @@ target_include_directories(benchmark_static PUBLIC ${TMP_PROP})
 get_target_property(TMP_PROP benchmark::benchmark LINK_LIBRARIES)
 target_link_libraries(benchmark_static PUBLIC ${TMP_PROP})
 
-
 target_include_directories(ANN_BENCH PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
 target_link_libraries(
-  ANN_BENCH PRIVATE nlohmann_json::nlohmann_json benchmark_static dl -static-libgcc -static-libstdc++
+  ANN_BENCH PRIVATE nlohmann_json::nlohmann_json benchmark_static dl -static-libgcc
+                    -static-libstdc++
 )
 set_target_properties(
   ANN_BENCH
   PROPERTIES # set target compile options
-             INSTALL_RPATH "\$ORIGIN/../../../lib"
              CXX_STANDARD 17
              CXX_STANDARD_REQUIRED ON
              CUDA_STANDARD 17
              CUDA_STANDARD_REQUIRED ON
              POSITION_INDEPENDENT_CODE ON
              INTERFACE_POSITION_INDEPENDENT_CODE ON
+             BUILD_RPATH "\$ORIGIN"
+             INSTALL_RPATH "\$ORIGIN"
 )
 
 target_link_options(ANN_BENCH PRIVATE -export-dynamic)
