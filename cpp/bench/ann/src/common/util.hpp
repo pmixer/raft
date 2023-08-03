@@ -139,7 +139,10 @@ struct cuda_timer {
 
 inline auto cuda_info()
 {
-  int dev;
+  int dev, driver = 0, runtime = 0;
+  cudaDriverGetVersion(&driver);
+  cudaRuntimeGetVersion(&runtime);
+
   cudaDeviceProp device_prop;
   cudaGetDevice(&dev);
   cudaGetDeviceProperties(&device_prop, dev);
@@ -151,6 +154,10 @@ inline auto cuda_info()
   props.emplace_back("gpu_mem_bus_width", std::to_string(device_prop.memoryBusWidth));
   props.emplace_back("gpu_mem_global_size", std::to_string(device_prop.totalGlobalMem));
   props.emplace_back("gpu_mem_shared_size", std::to_string(device_prop.sharedMemPerMultiprocessor));
+  props.emplace_back("gpu_driver_version",
+                     std::to_string(driver / 1000) + "." + std::to_string((driver % 100) / 10));
+  props.emplace_back("gpu_runtime_version",
+                     std::to_string(runtime / 1000) + "." + std::to_string((runtime % 100) / 10));
   return props;
 }
 

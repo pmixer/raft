@@ -30,7 +30,7 @@ struct lib_handle {
   void* handle{nullptr};
   explicit lib_handle(const std::string& name)
   {
-    handle = dlopen(name.c_str(), RTLD_LAZY | RTLD_GLOBAL | RTLD_DEEPBIND | RTLD_NODELETE);
+    handle = dlopen(name.c_str(), RTLD_LAZY | RTLD_LOCAL);
     if (handle == nullptr) {
       auto error_msg = "Failed to load " + name;
       auto err       = dlerror();

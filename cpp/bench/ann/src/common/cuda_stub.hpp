@@ -101,6 +101,16 @@ namespace stub {
   *device = 0;
   return cudaSuccess;
 };
+[[gnu::weak, gnu::noinline]] cudaError_t cudaDriverGetVersion(int* driver)
+{
+  *driver = 0;
+  return cudaSuccess;
+};
+[[gnu::weak, gnu::noinline]] cudaError_t cudaRuntimeGetVersion(int* runtime)
+{
+  *runtime = 0;
+  return cudaSuccess;
+};
 [[gnu::weak, gnu::noinline]] cudaError_t cudaGetDeviceProperties(struct cudaDeviceProp* prop,
                                                                  int device)
 {
@@ -129,6 +139,8 @@ RAFT_DECLARE_CUDART(cudaEventSynchronize);
 RAFT_DECLARE_CUDART(cudaEventElapsedTime);
 RAFT_DECLARE_CUDART(cudaEventDestroy);
 RAFT_DECLARE_CUDART(cudaGetDevice);
+RAFT_DECLARE_CUDART(cudaDriverGetVersion);
+RAFT_DECLARE_CUDART(cudaRuntimeGetVersion);
 RAFT_DECLARE_CUDART(cudaGetDeviceProperties);
 
 #undef RAFT_DECLARE_CUDART
